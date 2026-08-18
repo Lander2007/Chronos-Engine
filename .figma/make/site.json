@@ -1,0 +1,10 @@
+{
+  "description": "Experience a captivating scroll-driven showcase featuring a dynamic 3D crystal core, blending art and technology for immersive storytelling and exploration.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
