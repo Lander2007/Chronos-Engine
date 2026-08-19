@@ -10,11 +10,13 @@ import {
   Sliders,
   Sparkles,
   ArrowRight,
+  ArrowLeft,
   Volume2,
   VolumeX,
   Clock,
   Activity,
   ChevronRight,
+  ChevronDown,
 } from './components/Icons'
 import Crystal3D from './Crystal3D'
 import ScrollStages from './ScrollStages'
@@ -23,37 +25,37 @@ import ScrollStages from './ScrollStages'
 const PrecisionCursor = memo(function PrecisionCursor({ cursorState }: { cursorState: 'default' | 'hover' | 'node' }) {
   const dotRef   = useRef<HTMLDivElement>(null)
   const trailRef = useRef<HTMLDivElement>(null)
-  const pos = useRef({ x: 0, y: 0 })
-  const trail = useRef({ x: 0, y: 0 })
-  const raf = useRef<number>(0)
+  const posRef   = useRef({ x: 0, y: 0 })
+  const trailPos = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
     document.body.setAttribute('data-cursor-state', cursorState)
   }, [cursorState])
 
   useEffect(() => {
-    const onMove = (e: MouseEvent) => {
-      pos.current = { x: e.clientX, y: e.clientY }
-    }
-    window.addEventListener('mousemove', onMove, { passive: true })
-
-    const tick = () => {
+    const handleMouseMove = (e: MouseEvent) => {
+      posRef.current = { x: e.clientX, y: e.clientY }
       if (dotRef.current) {
-        dotRef.current.style.transform = `translate3d(${pos.current.x}px, ${pos.current.y}px, 0)`
+        dotRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
       }
-      trail.current.x += (pos.current.x - trail.current.x) * 0.15
-      trail.current.y += (pos.current.y - trail.current.y) * 0.15
-      if (trailRef.current) {
-        trailRef.current.style.transform = `translate3d(${trail.current.x}px, ${trail.current.y}px, 0)`
-      }
-      raf.current = requestAnimationFrame(tick)
     }
-    raf.current = requestAnimationFrame(tick)
 
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      cancelAnimationFrame(raf.current)
+    window.addEventListener('mousemove', handleMouseMove, { passive: true })
+    return () => window.removeEventListener('mousemove', handleMouseMove)
+  }, [])
+
+  useEffect(() => {
+    let animId: number
+    const loop = () => {
+      trailPos.current.x += (posRef.current.x - trailPos.current.x) * 0.18
+      trailPos.current.y += (posRef.current.y - trailPos.current.y) * 0.18
+      if (trailRef.current) {
+        trailRef.current.style.transform = `translate3d(${trailPos.current.x}px, ${trailPos.current.y}px, 0)`
+      }
+      animId = requestAnimationFrame(loop)
     }
+    animId = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(animId)
   }, [])
 
   return (
@@ -64,7 +66,7 @@ const PrecisionCursor = memo(function PrecisionCursor({ cursorState }: { cursorS
   )
 })
 
-// 7 Narrative Stage Rail Data
+// 7 Narrative & Technical Scroll Stages Data
 const NAV_STAGES = [
   { id: 'stage-1', num: '01', label: 'Discover', Icon: Compass },
   { id: 'stage-2', num: '02', label: 'Origin', Icon: BookOpen },
@@ -116,6 +118,68 @@ const VerticalTrackNav = memo(function VerticalTrackNav({
         )
       })}
     </nav>
+  )
+})
+
+// Mobile Quick Stage Ticker Bar (Memoized)
+const MobileStageBar = memo(function MobileStageBar({
+  activeStageIndex,
+  onCursorState,
+}: {
+  activeStageIndex: number
+  onCursorState: (state: 'default' | 'hover' | 'node') => void
+}) {
+  const currentStage = NAV_STAGES[activeStageIndex] || NAV_STAGES[0]
+  const StageIcon = currentStage.Icon
+
+  const scrollToStage = (index: number) => {
+    const targetIdx = Math.max(0, Math.min(NAV_STAGES.length - 1, index))
+    const totalHeight = document.documentElement.scrollHeight - window.innerHeight
+    const targetY = (targetIdx / (NAV_STAGES.length - 1)) * totalHeight
+    window.scrollTo({ top: targetY, behavior: 'smooth' })
+  }
+
+  return (
+    <div className="mobile-stage-bar">
+      <button
+        onClick={() => scrollToStage(activeStageIndex - 1)}
+        disabled={activeStageIndex === 0}
+        style={{
+          background: 'transparent',
+          border: 'none',
+          color: activeStageIndex === 0 ? 'rgba(88,13,24,0.3)' : '#580D18',
+          padding: '6px',
+          display: 'flex',
+          alignItems: 'center',
+          cursor: activeStageIndex === 0 ? 'default' : 'pointer',
+        }}
+      >
+        <ArrowLeft size={16} />
+      </button>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <StageIcon size={14} style={{ color: '#DB1A1A' }} />
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', fontWeight: 700, color: '#580D18', letterSpacing: '0.1em' }}>
+          [{currentStage.num} / 07] {currentStage.label.toUpperCase()}
+        </span>
+      </div>
+
+      <button
+        onClick={() => scrollToStage(activeStageIndex + 1)}
+        disabled={activeStageIndex === NAV_STAGES.length - 1}
+        style={{
+          background: 'transparent',
+          border: 'none',
+          color: activeStageIndex === NAV_STAGES.length - 1 ? 'rgba(88,13,24,0.3)' : '#580D18',
+          padding: '6px',
+          display: 'flex',
+          alignItems: 'center',
+          cursor: activeStageIndex === NAV_STAGES.length - 1 ? 'default' : 'pointer',
+        }}
+      >
+        <ArrowRight size={16} />
+      </button>
+    </div>
   )
 })
 
@@ -399,6 +463,11 @@ export default function App() {
       />
 
       <VerticalTrackNav
+        activeStageIndex={activeStageIndex}
+        onCursorState={setCursorState}
+      />
+
+      <MobileStageBar
         activeStageIndex={activeStageIndex}
         onCursorState={setCursorState}
       />

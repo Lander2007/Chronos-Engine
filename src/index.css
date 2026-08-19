@@ -978,12 +978,79 @@ h1, h2, h3, h4, h5, h6 {
   transform: rotate(90deg);
 }
 
+/* ── Mobile Navigation Bar & Responsive Media Queries ── */
+.mobile-stage-bar {
+  display: none;
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 1000;
+  background: rgba(244, 241, 234, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(88, 13, 24, 0.25);
+  border-left: 3px solid #DB1A1A;
+  padding: 10px 16px;
+  box-shadow: 0 16px 36px rgba(60, 8, 16, 0.2);
+  align-items: center;
+  justify-content: space-between;
+}
+
 @media (max-width: 900px) {
   .nav-track { display: none; }
-  .global-header { padding: 18px 20px; }
-  .type-level-01 { font-size: clamp(3rem, 15vw, 6.5rem); }
-  .drawer-panel { width: 100vw; padding: 36px 24px; }
-  .modal-float-panel { padding: 28px 20px; max-height: 90vh; }
+  .mobile-stage-bar { display: flex; }
+  .global-header { padding: 14px 16px; }
+  .brand-title { font-size: 0.72rem; }
+  .header-meta { display: none !important; }
+  
+  .type-level-01 { font-size: clamp(2.6rem, 11vw, 4.5rem); }
+  .type-level-02 { font-size: clamp(1.8rem, 8vw, 3rem); }
+  .type-level-03 { font-size: clamp(1.1rem, 5vw, 1.5rem); }
+  
+  .info-card { 
+    padding: 24px 20px; 
+    border-radius: 0;
+  }
+  
+  .drawer-panel { width: 100vw; padding: 28px 20px; }
+  .modal-float-panel { padding: 24px 18px; max-height: 92vh; border-radius: 0; }
+  
+  .node-marker-badge {
+    padding: 6px 10px;
+    font-size: 0.62rem;
+  }
+}
+
+@media (max-width: 640px) {
+  section[id^="stage-"] {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    padding-top: 90px !important;
+    padding-bottom: 90px !important;
+    justify-content: center !important;
+  }
+  
+  .btn-rect,
+  .cta-primary,
+  .cta-secondary {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 14px 20px !important;
+    font-size: 0.72rem !important;
+  }
+  
+  .hud-pill {
+    font-size: 0.6rem !important;
+    padding: 4px 10px !important;
+  }
+
+  .modal-float-close {
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
