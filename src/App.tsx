@@ -262,7 +262,7 @@ const GlobalHeader = memo(function GlobalHeader({
             ) : (
               <VolumeX size={13} style={{ opacity: 0.6 }} />
             )}
-            <span>SOUND: {isAudioOn ? 'ON (7.83Hz)' : 'OFF'}</span>
+            <span className="header-meta">SOUND: {isAudioOn ? 'ON (7.83Hz)' : 'OFF'}</span>
           </button>
         </div>
       </header>

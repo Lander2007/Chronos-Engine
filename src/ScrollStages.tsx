@@ -134,7 +134,7 @@ const OriginManifestoCard = memo(function OriginManifestoCard({
         Select a codex entry below to explore how Chronos Engine stabilizes non-Euclidean temporal anomalies.
       </p>
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', flexWrap: 'wrap' }}>
         {stories.map((s, idx) => {
           const StoryIcon = s.Icon
           const isActive = activeStoryIdx === idx
@@ -221,7 +221,7 @@ const TechnicalSpecCard = memo(function TechnicalSpecCard({
         Precision engineered borosilicate facets paired with dual gyroscopic stabilization rings.
       </p>
 
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid rgba(88,13,24,0.12)', paddingBottom: '10px' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid rgba(88,13,24,0.12)', paddingBottom: '10px', flexWrap: 'wrap' }}>
         {[
           { id: 'core', label: 'CORE', Icon: Cpu },
           { id: 'optics', label: 'OPTICS', Icon: Eye },
@@ -263,7 +263,7 @@ const TechnicalSpecCard = memo(function TechnicalSpecCard({
           ['INNER RESONATOR', 'Schumann-Locked Sphere (7.83Hz)'],
           ['MASS DISPLACEMENT', '∞ (non-Newtonian Tensor)'],
         ].map(([label, value]) => (
-          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(88,13,24,0.08)', paddingBottom: '8px' }}>
+          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(88,13,24,0.08)', paddingBottom: '8px', flexWrap: 'wrap', gap: '4px' }}>
             <span className="type-level-05" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               <Radio size={10} style={{ color: '#DB1A1A', opacity: 0.7 }} />
               <span>{label}</span>
@@ -459,7 +459,7 @@ const TemporalMechanicsCard = memo(function TemporalMechanicsCard({
         The 3-stage physical energy conversion loop operating continuously inside Chronos Engine.
       </p>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '20px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(80px, 1fr))', gap: '8px', marginBottom: '20px' }}>
         {steps.map((st, idx) => {
           const StepIcon = st.Icon
           const isActive = activeStep === idx
@@ -548,7 +548,7 @@ const ControlDashboard = memo(function ControlDashboard({
         SYSTEM STATE FEEDBACK
       </h3>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '28px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '28px' }}>
         <div style={{ background: '#3C0810', color: '#F4F1EA', padding: '14px', borderLeft: '3px solid #812033' }}>
           <div className="type-level-05" style={{ color: '#914354', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <CheckCircle2 size={12} style={{ color: '#DB1A1A' }} />
@@ -649,7 +649,7 @@ const ControlDashboard = memo(function ControlDashboard({
             )}
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '8px' }}>
             <button
               onClick={() => onControlChange({ energy: 72, speed: 1.0, phase: 4 })}
               onMouseEnter={() => onCursorState?.('hover')}
@@ -963,7 +963,7 @@ export default function ScrollStages({
         overflow: 'hidden',
         pointerEvents: 'none',
       }}>
-        <div style={{ position: 'relative', zIndex: 6, maxWidth: '780px', pointerEvents: 'auto' }}>
+        <div style={{ position: 'relative', zIndex: 6, maxWidth: '850px', pointerEvents: 'auto' }}>
           <div className="hud-pill" style={{ marginBottom: '20px' }}>
             <Sparkles size={13} style={{ color: '#DB1A1A' }} />
             <span>STAGE 01 // DISCOVER</span>
@@ -1019,21 +1019,7 @@ export default function ScrollStages({
           </div>
         </div>
 
-        <div style={{
-          position: 'absolute',
-          bottom: '36px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '10px',
-          zIndex: 6,
-          pointerEvents: 'none',
-        }}>
-          <span className="type-level-05" style={{ fontSize: '0.6rem' }}>SCROLL TO ENGAGE</span>
-          <ChevronDown size={22} style={{ color: '#DB1A1A' }} className="icon-pulse-glow" />
-        </div>
+
       </section>
 
       <section id="stage-2" style={{
@@ -1074,7 +1060,7 @@ export default function ScrollStages({
           }}>ORIGIN</span>
         </div>
 
-        <div style={{ position: 'relative', zIndex: 6, width: '100%', maxWidth: '580px' }}>
+        <div style={{ position: 'relative', zIndex: 6, width: '100%', maxWidth: '580px', margin: '0 auto' }}>
           <OriginManifestoCard onCursorState={onCursorState} />
         </div>
       </section>
@@ -1117,7 +1103,7 @@ export default function ScrollStages({
           }}>SYSTEM</span>
         </div>
 
-        <div style={{ position: 'relative', zIndex: 6, width: '100%', maxWidth: '580px' }}>
+        <div style={{ position: 'relative', zIndex: 6, width: '100%', maxWidth: '580px', margin: '0 auto' }}>
           <TechnicalSpecCard
             onOpenFullSpecs={() => setIsSpecDrawerOpen(true)}
             onCursorState={onCursorState}
@@ -1161,7 +1147,7 @@ export default function ScrollStages({
           }}>NODES</span>
         </div>
 
-        <div style={{ position: 'relative', zIndex: 6, width: '100%', maxWidth: '540px' }}>
+        <div style={{ position: 'relative', zIndex: 6, width: '100%', maxWidth: '540px', margin: '0 auto' }}>
           <NodeDiscoveryCard
             selectedNode={selectedNode}
             onSelectNode={onSelectNode}
@@ -1198,7 +1184,7 @@ export default function ScrollStages({
           }}>MECHANICS</span>
         </div>
 
-        <div style={{ position: 'relative', zIndex: 6, width: '100%', maxWidth: '560px' }}>
+        <div style={{ position: 'relative', zIndex: 6, width: '100%', maxWidth: '560px', margin: '0 auto' }}>
           <TemporalMechanicsCard onCursorState={onCursorState} />
         </div>
       </section>
@@ -1231,7 +1217,7 @@ export default function ScrollStages({
           }}>CONTROL</span>
         </div>
 
-        <div style={{ position: 'relative', zIndex: 6, width: '100%', maxWidth: '520px' }}>
+        <div style={{ position: 'relative', zIndex: 6, width: '100%', maxWidth: '520px', margin: '0 auto' }}>
           <ControlDashboard
             controlState={controlState}
             onControlChange={onControlChange}

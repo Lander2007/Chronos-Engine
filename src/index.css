@@ -131,9 +131,9 @@ h1, h2, h3, h4, h5, h6 {
 .type-level-01 {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(3.8rem, 11vw, 11.5rem);
-  line-height: 0.88;
-  letter-spacing: -0.04em;
+  font-size: clamp(3.2rem, 8vw, 8.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
   color: #DB1A1A;
 }
 
@@ -997,59 +997,178 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: space-between;
 }
 
+/* ── Disable custom cursor on touch devices ── */
+@media (pointer: coarse) {
+  * { cursor: auto !important; }
+  .cursor-dot,
+  .cursor-trail { display: none !important; }
+}
+
+/* ── Tablet & Small Desktop ── */
+@media (max-width: 1200px) {
+  .type-level-01 {
+    font-size: clamp(3rem, 7vw, 7rem);
+  }
+  
+  .nav-track {
+    right: 20px;
+  }
+  
+  .nav-track-label {
+    display: none !important;
+  }
+}
+
+/* ── Tablet Portrait & Large Mobile ── */
 @media (max-width: 900px) {
   .nav-track { display: none; }
   .mobile-stage-bar { display: flex; }
   .global-header { padding: 14px 16px; }
   .brand-title { font-size: 0.72rem; }
   .header-meta { display: none !important; }
-  
-  .type-level-01 { font-size: clamp(2.6rem, 11vw, 4.5rem); }
-  .type-level-02 { font-size: clamp(1.8rem, 8vw, 3rem); }
-  .type-level-03 { font-size: clamp(1.1rem, 5vw, 1.5rem); }
-  
-  .info-card { 
-    padding: 24px 20px; 
+
+  .type-level-01 { font-size: clamp(2.4rem, 9vw, 4.2rem); }
+  .type-level-02 { font-size: clamp(1.6rem, 6vw, 2.8rem); }
+  .type-level-03 { font-size: clamp(1rem, 4vw, 1.4rem); }
+  .type-level-04 { font-size: clamp(0.88rem, 2.5vw, 1rem); }
+
+  .info-card {
+    padding: 24px 20px;
     border-radius: 0;
   }
-  
+
   .drawer-panel { width: 100vw; padding: 28px 20px; }
   .modal-float-panel { padding: 24px 18px; max-height: 92vh; border-radius: 0; }
-  
+  .modal-float-backdrop { padding: 12px; }
+
   .node-marker-badge {
     padding: 6px 10px;
     font-size: 0.62rem;
   }
+
+  /* Section layout: stack cards centered */
+  section[id^="stage-"] {
+    justify-content: center !important;
+    padding-top: 10vh !important;
+    padding-bottom: 10vh !important;
+  }
+
+  /* Spec/metric rows wrap */
+  .section-meta-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
 }
 
+/* ── Mobile ── */
 @media (max-width: 640px) {
   section[id^="stage-"] {
     padding-left: 16px !important;
     padding-right: 16px !important;
-    padding-top: 90px !important;
-    padding-bottom: 90px !important;
+    padding-top: 80px !important;
+    padding-bottom: 80px !important;
+    min-height: auto !important;
     justify-content: center !important;
+    align-items: flex-start !important;
   }
-  
+
+  .type-level-01 { font-size: clamp(2rem, 10vw, 3.2rem); }
+  .type-level-02 { font-size: clamp(1.4rem, 7vw, 2.2rem); }
+  .type-level-03 { font-size: clamp(0.95rem, 4.5vw, 1.2rem); }
+  .type-level-04 { font-size: clamp(0.85rem, 3vw, 0.95rem); line-height: 1.6; }
+  .type-level-05 { font-size: 0.6rem; letter-spacing: 0.12em; }
+
+  .global-header { padding: 10px 12px; }
+  .brand-title { font-size: 0.65rem; letter-spacing: 0.12em; }
+
+  .info-card {
+    padding: 20px 16px;
+  }
+
   .btn-rect,
   .cta-primary,
   .cta-secondary {
     width: 100% !important;
     justify-content: center !important;
     padding: 14px 20px !important;
-    font-size: 0.72rem !important;
+    font-size: 0.68rem !important;
+    letter-spacing: 0.12em !important;
   }
-  
+
   .hud-pill {
-    font-size: 0.6rem !important;
+    font-size: 0.58rem !important;
     padding: 4px 10px !important;
   }
 
   .modal-float-close {
-    top: 16px;
-    right: 16px;
+    top: 12px;
+    right: 12px;
     width: 32px;
     height: 32px;
+  }
+
+  .modal-float-panel {
+    padding: 20px 14px;
+    max-height: 95vh;
+  }
+
+  .modal-float-backdrop {
+    padding: 8px;
+  }
+
+  .drawer-panel {
+    width: 100vw;
+    padding: 24px 16px;
+  }
+
+  .drawer-close-btn {
+    top: 16px;
+    right: 16px;
+  }
+
+  .mobile-stage-bar {
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    padding: 8px 12px;
+  }
+
+  /* Loader adjustments */
+  .loader-overlay {
+    padding: 20px;
+  }
+}
+
+/* ── Extra Small Mobile ── */
+@media (max-width: 400px) {
+  .type-level-01 { font-size: clamp(1.8rem, 11vw, 2.8rem); }
+  .type-level-02 { font-size: clamp(1.2rem, 7vw, 1.8rem); }
+  .type-level-03 { font-size: clamp(0.88rem, 4.5vw, 1.1rem); }
+
+  .global-header { padding: 8px 10px; }
+  .brand-title { font-size: 0.58rem; }
+
+  .info-card { padding: 16px 12px; }
+
+  .btn-rect,
+  .cta-primary,
+  .cta-secondary {
+    padding: 12px 16px !important;
+    font-size: 0.62rem !important;
+    gap: 8px !important;
+  }
+
+  .hud-pill {
+    font-size: 0.52rem !important;
+    padding: 3px 8px !important;
+  }
+
+  .mobile-stage-bar {
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+    padding: 6px 10px;
+    font-size: 0.6rem;
   }
 }
 
@@ -1061,7 +1180,3 @@ h1, h2, h3, h4, h5, h6 {
     scroll-behavior: auto !important;
   }
 }
-
-
-
-
