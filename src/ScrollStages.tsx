@@ -1,4 +1,36 @@
 import { useEffect, useRef, useState, memo } from 'react'
+import {
+  Sparkles,
+  Activity,
+  Zap,
+  Eye,
+  ArrowRight,
+  ArrowLeft,
+  ChevronRight,
+  ChevronDown,
+  BookOpen,
+  ShieldAlert,
+  Layers,
+  Globe,
+  Cpu,
+  Radio,
+  Maximize2,
+  FileText,
+  Crosshair,
+  Target,
+  CircleDot,
+  X,
+  RotateCw,
+  RefreshCw,
+  Sliders,
+  Gauge,
+  Clock,
+  FastForward,
+  Shield,
+  Terminal,
+  CheckCircle2,
+  Compass,
+} from './components/Icons'
 import { SYSTEM_NODES } from './Crystal3D'
 
 interface ControlState {
@@ -56,20 +88,25 @@ const OriginManifestoCard = memo(function OriginManifestoCard({
       title: 'PRE-SPACETIME ANOMALY',
       subtitle: 'ORIGIN EPOCH // -4.1 × 10¹² YEARS',
       content: 'The core predates the Big Bang and thermodynamic entropy. Its interior geometry violates Euclidean constraints — facets absorb light waves before arrival.',
+      Icon: ShieldAlert,
     },
     {
       num: '02',
       title: 'THE BURGUNDY MATRIX',
       subtitle: 'MATERIAL SPECTRA // BOROSILICATE',
       content: 'Constructed from a controlled burgundy tonal crystal lattice that decelerates relativistic timeline degradation and holds high-frequency flux in equilibrium.',
+      Icon: Layers,
     },
     {
       num: '03',
       title: 'RELATIVISTIC OBSERVATION',
       subtitle: 'STABILIZATION // SCHUMANN LOCK',
       content: 'Humankind constructed the dual-ring gyroscopic gimbals to safely observe temporal shifts without disturbing local timeline causality.',
+      Icon: Globe,
     },
   ]
+
+  const ActiveIcon = stories[activeStoryIdx].Icon
 
   return (
     <div
@@ -82,7 +119,10 @@ const OriginManifestoCard = memo(function OriginManifestoCard({
       }}
     >
       <div className="section-meta-header">
-        <span className="section-tag">02 // ORIGIN & ANOMALY CODEX</span>
+        <span className="section-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <BookOpen size={13} style={{ color: '#DB1A1A' }} />
+          <span>02 // ORIGIN & ANOMALY CODEX</span>
+        </span>
         <span className="section-num">ORIGIN</span>
       </div>
 
@@ -95,32 +135,44 @@ const OriginManifestoCard = memo(function OriginManifestoCard({
       </p>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-        {stories.map((s, idx) => (
-          <button
-            key={s.num}
-            onClick={() => setActiveStoryIdx(idx)}
-            onMouseEnter={() => onCursorState?.('hover')}
-            onMouseLeave={() => onCursorState?.('default')}
-            style={{
-              flex: 1,
-              padding: '10px 8px',
-              background: activeStoryIdx === idx ? '#DB1A1A' : 'rgba(88,13,24,0.04)',
-              color: activeStoryIdx === idx ? '#F4F1EA' : '#580D18',
-              border: '1px solid ' + (activeStoryIdx === idx ? '#DB1A1A' : 'rgba(88,13,24,0.16)'),
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.7rem',
-              fontWeight: 700,
-              transition: 'all 0.25s ease',
-            }}
-          >
-            {s.num} CODEX
-          </button>
-        ))}
+        {stories.map((s, idx) => {
+          const StoryIcon = s.Icon
+          const isActive = activeStoryIdx === idx
+          return (
+            <button
+              key={s.num}
+              onClick={() => setActiveStoryIdx(idx)}
+              onMouseEnter={() => onCursorState?.('hover')}
+              onMouseLeave={() => onCursorState?.('default')}
+              style={{
+                flex: 1,
+                padding: '10px 8px',
+                background: isActive ? '#DB1A1A' : 'rgba(88,13,24,0.04)',
+                color: isActive ? '#F4F1EA' : '#580D18',
+                border: '1px solid ' + (isActive ? '#DB1A1A' : 'rgba(88,13,24,0.16)'),
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.68rem',
+                fontWeight: 700,
+                transition: 'all 0.25s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+              }}
+            >
+              <StoryIcon size={12} style={{ color: isActive ? '#F4F1EA' : '#DB1A1A' }} />
+              <span>{s.num} CODEX</span>
+            </button>
+          )
+        })}
       </div>
 
-      <div style={{ background: '#3C0810', color: '#F4F1EA', padding: '24px', borderLeft: '3px solid #DB1A1A' }}>
-        <div className="type-level-05" style={{ color: '#DB1A1A', marginBottom: '6px' }}>
-          {stories[activeStoryIdx].subtitle}
+      <div style={{ background: '#3C0810', color: '#F4F1EA', padding: '24px', borderLeft: '3px solid #DB1A1A', position: 'relative' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+          <span className="type-level-05" style={{ color: '#DB1A1A' }}>
+            {stories[activeStoryIdx].subtitle}
+          </span>
+          <ActiveIcon size={16} style={{ color: '#DB1A1A', opacity: 0.85 }} />
         </div>
         <h4 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.1rem', marginBottom: '12px', color: '#F4F1EA' }}>
           {stories[activeStoryIdx].title}
@@ -154,7 +206,10 @@ const TechnicalSpecCard = memo(function TechnicalSpecCard({
       }}
     >
       <div className="section-meta-header">
-        <span className="section-tag">03 // ARCHITECTURE & GEOMETRY</span>
+        <span className="section-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <Cpu size={13} style={{ color: '#DB1A1A' }} />
+          <span>03 // ARCHITECTURE & GEOMETRY</span>
+        </span>
         <span className="section-num">ARCHITECTURE</span>
       </div>
 
@@ -167,27 +222,38 @@ const TechnicalSpecCard = memo(function TechnicalSpecCard({
       </p>
 
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid rgba(88,13,24,0.12)', paddingBottom: '10px' }}>
-        {(['core', 'optics', 'telemetry'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            onMouseEnter={() => onCursorState?.('hover')}
-            onMouseLeave={() => onCursorState?.('default')}
-            style={{
-              background: activeTab === tab ? '#DB1A1A' : 'transparent',
-              color: activeTab === tab ? '#F4F1EA' : '#580D18',
-              border: '1px solid ' + (activeTab === tab ? '#DB1A1A' : 'rgba(88,13,24,0.2)'),
-              padding: '6px 14px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.65rem',
-              letterSpacing: '0.12em',
-              textTransform: uppercase(tab),
-              transition: 'all 0.25s ease',
-            }}
-          >
-            {tab.toUpperCase()}
-          </button>
-        ))}
+        {[
+          { id: 'core', label: 'CORE', Icon: Cpu },
+          { id: 'optics', label: 'OPTICS', Icon: Eye },
+          { id: 'telemetry', label: 'TELEMETRY', Icon: Activity },
+        ].map((tab) => {
+          const TabIcon = tab.Icon
+          const isActive = activeTab === tab.id
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as 'core' | 'optics' | 'telemetry')}
+              onMouseEnter={() => onCursorState?.('hover')}
+              onMouseLeave={() => onCursorState?.('default')}
+              style={{
+                background: isActive ? '#DB1A1A' : 'transparent',
+                color: isActive ? '#F4F1EA' : '#580D18',
+                border: '1px solid ' + (isActive ? '#DB1A1A' : 'rgba(88,13,24,0.2)'),
+                padding: '6px 14px',
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.65rem',
+                letterSpacing: '0.12em',
+                transition: 'all 0.25s ease',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              <TabIcon size={12} style={{ color: isActive ? '#F4F1EA' : '#DB1A1A' }} />
+              <span>{tab.label}</span>
+            </button>
+          )
+        })}
       </div>
 
       <div style={{ display: 'grid', gap: '14px', marginBottom: '28px' }}>
@@ -197,8 +263,11 @@ const TechnicalSpecCard = memo(function TechnicalSpecCard({
           ['INNER RESONATOR', 'Schumann-Locked Sphere (7.83Hz)'],
           ['MASS DISPLACEMENT', '∞ (non-Newtonian Tensor)'],
         ].map(([label, value]) => (
-          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(88,13,24,0.08)', paddingBottom: '8px' }}>
-            <span className="type-level-05">{label}</span>
+          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(88,13,24,0.08)', paddingBottom: '8px' }}>
+            <span className="type-level-05" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Radio size={10} style={{ color: '#DB1A1A', opacity: 0.7 }} />
+              <span>{label}</span>
+            </span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', fontWeight: 600, color: '#580D18' }}>{value}</span>
           </div>
         ))}
@@ -209,8 +278,11 @@ const TechnicalSpecCard = memo(function TechnicalSpecCard({
           ['SURFACE TRANSMISSION', '94.8% Relativistic Alpha'],
           ['LIGHT WAVELENGTH', '480nm - 720nm Crimson'],
         ].map(([label, value]) => (
-          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(88,13,24,0.08)', paddingBottom: '8px' }}>
-            <span className="type-level-05">{label}</span>
+          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(88,13,24,0.08)', paddingBottom: '8px' }}>
+            <span className="type-level-05" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Eye size={10} style={{ color: '#DB1A1A', opacity: 0.7 }} />
+              <span>{label}</span>
+            </span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', fontWeight: 600, color: '#580D18' }}>{value}</span>
           </div>
         ))}
@@ -221,8 +293,11 @@ const TechnicalSpecCard = memo(function TechnicalSpecCard({
           ['FLUX VELOCITY', '0.003 δ / sec'],
           ['ENTROPY VECTOR', 'Zero-State Lock'],
         ].map(([label, value]) => (
-          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(88,13,24,0.08)', paddingBottom: '8px' }}>
-            <span className="type-level-05">{label}</span>
+          <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(88,13,24,0.08)', paddingBottom: '8px' }}>
+            <span className="type-level-05" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Activity size={10} style={{ color: '#DB1A1A', opacity: 0.7 }} />
+              <span>{label}</span>
+            </span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', fontWeight: 600, color: '#580D18' }}>{value}</span>
           </div>
         ))}
@@ -236,7 +311,9 @@ const TechnicalSpecCard = memo(function TechnicalSpecCard({
         style={{ width: '100%', justifyContent: 'center' }}
       >
         <span>FULL SPECIFICATION DOSSIER</span>
-        <span className="btn-arrow">→</span>
+        <span className="btn-arrow">
+          <ArrowRight size={15} />
+        </span>
       </button>
     </div>
   )
@@ -264,7 +341,10 @@ const NodeDiscoveryCard = memo(function NodeDiscoveryCard({
       }}
     >
       <div className="section-meta-header">
-        <span className="section-tag">04 // SYSTEM NODES & AGENCY</span>
+        <span className="section-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <Crosshair size={13} style={{ color: '#DB1A1A' }} />
+          <span>04 // SYSTEM NODES & AGENCY</span>
+        </span>
         <span className="section-num">NODES</span>
       </div>
 
@@ -297,16 +377,19 @@ const NodeDiscoveryCard = memo(function NodeDiscoveryCard({
                 textAlign: 'left',
               }}
             >
-              <div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', opacity: 0.7 }}>
-                  [{String(node.id + 1).padStart(2, '0')}] {node.subtitle}
-                </div>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.88rem' }}>
-                  {node.title}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <Target size={15} style={{ color: isSelected ? '#F4F1EA' : '#DB1A1A' }} />
+                <div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', opacity: 0.7 }}>
+                    [{String(node.id + 1).padStart(2, '0')}] {node.subtitle}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.88rem' }}>
+                    {node.title}
+                  </div>
                 </div>
               </div>
-              <span className="btn-arrow" style={{ fontSize: '1.1rem' }}>
-                {isSelected ? '✕' : '→'}
+              <span className="btn-arrow" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {isSelected ? <X size={16} /> : <ChevronRight size={16} />}
               </span>
             </button>
           )
@@ -330,20 +413,25 @@ const TemporalMechanicsCard = memo(function TemporalMechanicsCard({
       title: 'FLUX CAPTURE',
       desc: 'Zero-point temporal waves pass into the displaced borosilicate facets, slowing un-arrived photons.',
       metric: 'DISPLACEMENT // 0.003 δ',
+      Icon: Zap,
     },
     {
       step: 'STEP 02',
       title: 'GYROSCOPIC CANCELLATION',
       desc: 'Dual oxblood gimbals counter-rotate, absorbing relativistic gravitational torque and eliminating time drift.',
       metric: 'TORQUE // ZERO-STATE',
+      Icon: RefreshCw,
     },
     {
       step: 'STEP 03',
       title: 'HARMONIC EMISSION',
       desc: 'The central core emits coherent 7.83Hz Schumann resonance waves, yielding 94.2 TW stable output.',
       metric: 'OUTPUT // 94.2 TW',
+      Icon: Radio,
     },
   ]
+
+  const ActiveStepIcon = steps[activeStep].Icon
 
   return (
     <div
@@ -356,7 +444,10 @@ const TemporalMechanicsCard = memo(function TemporalMechanicsCard({
       }}
     >
       <div className="section-meta-header">
-        <span className="section-tag">05 // TEMPORAL MECHANICS & PROCESS</span>
+        <span className="section-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <RotateCw size={13} style={{ color: '#DB1A1A' }} />
+          <span>05 // TEMPORAL MECHANICS & PROCESS</span>
+        </span>
         <span className="section-num">MECHANICS</span>
       </div>
 
@@ -369,32 +460,44 @@ const TemporalMechanicsCard = memo(function TemporalMechanicsCard({
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '20px' }}>
-        {steps.map((st, idx) => (
-          <button
-            key={st.step}
-            onClick={() => setActiveStep(idx as 0 | 1 | 2)}
-            onMouseEnter={() => onCursorState?.('hover')}
-            onMouseLeave={() => onCursorState?.('default')}
-            style={{
-              padding: '8px 4px',
-              background: activeStep === idx ? '#DB1A1A' : 'rgba(88,13,24,0.04)',
-              color: activeStep === idx ? '#F4F1EA' : '#580D18',
-              border: '1px solid ' + (activeStep === idx ? '#DB1A1A' : 'rgba(88,13,24,0.16)'),
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.62rem',
-              fontWeight: 700,
-              textAlign: 'center',
-              transition: 'all 0.25s ease',
-            }}
-          >
-            {st.step}
-          </button>
-        ))}
+        {steps.map((st, idx) => {
+          const StepIcon = st.Icon
+          const isActive = activeStep === idx
+          return (
+            <button
+              key={st.step}
+              onClick={() => setActiveStep(idx as 0 | 1 | 2)}
+              onMouseEnter={() => onCursorState?.('hover')}
+              onMouseLeave={() => onCursorState?.('default')}
+              style={{
+                padding: '8px 4px',
+                background: isActive ? '#DB1A1A' : 'rgba(88,13,24,0.04)',
+                color: isActive ? '#F4F1EA' : '#580D18',
+                border: '1px solid ' + (isActive ? '#DB1A1A' : 'rgba(88,13,24,0.16)'),
+                fontFamily: 'var(--font-mono)',
+                fontSize: '0.62rem',
+                fontWeight: 700,
+                textAlign: 'center',
+                transition: 'all 0.25s ease',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+              }}
+            >
+              <StepIcon size={12} style={{ color: isActive ? '#F4F1EA' : '#DB1A1A' }} />
+              <span>{st.step}</span>
+            </button>
+          )
+        })}
       </div>
 
       <div style={{ background: '#3C0810', color: '#F4F1EA', padding: '24px', borderLeft: '3px solid #DB1A1A' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-          <span className="type-level-05" style={{ color: '#DB1A1A' }}>{steps[activeStep].step}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+          <span className="type-level-05" style={{ color: '#DB1A1A', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <ActiveStepIcon size={13} />
+            <span>{steps[activeStep].step}</span>
+          </span>
           <span className="type-level-05" style={{ color: '#DB1A1A' }}>{steps[activeStep].metric}</span>
         </div>
         <h4 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.15rem', marginBottom: '12px', color: '#F4F1EA' }}>
@@ -434,7 +537,10 @@ const ControlDashboard = memo(function ControlDashboard({
       }}
     >
       <div className="section-meta-header">
-        <span className="section-tag">06 // REAL-TIME ENGINE CONTROL</span>
+        <span className="section-tag" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <Sliders size={13} style={{ color: '#DB1A1A' }} />
+          <span>06 // REAL-TIME ENGINE CONTROL</span>
+        </span>
         <span className="section-num">CONTROL</span>
       </div>
 
@@ -444,26 +550,41 @@ const ControlDashboard = memo(function ControlDashboard({
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '28px' }}>
         <div style={{ background: '#3C0810', color: '#F4F1EA', padding: '14px', borderLeft: '3px solid #812033' }}>
-          <div className="type-level-05" style={{ color: '#914354' }}>SYSTEM STATE</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.05rem', color: '#F4F1EA' }}>
+          <div className="type-level-05" style={{ color: '#914354', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <CheckCircle2 size={12} style={{ color: '#DB1A1A' }} />
+            <span>SYSTEM STATE</span>
+          </div>
+          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.05rem', color: '#F4F1EA', marginTop: '4px' }}>
             ACTIVE
           </div>
         </div>
+
         <div style={{ background: '#3C0810', color: '#F4F1EA', padding: '14px', borderLeft: '3px solid #6E1422' }}>
-          <div className="type-level-05" style={{ color: '#914354' }}>RESONANCE</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.05rem', color: '#F4F1EA' }}>
+          <div className="type-level-05" style={{ color: '#914354', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Zap size={12} style={{ color: '#DB1A1A' }} />
+            <span>RESONANCE</span>
+          </div>
+          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.05rem', color: '#F4F1EA', marginTop: '4px' }}>
             {controlState.energy}%
           </div>
         </div>
+
         <div style={{ background: '#3C0810', color: '#F4F1EA', padding: '14px', borderLeft: '3px solid #6E1422' }}>
-          <div className="type-level-05" style={{ color: '#914354' }}>ROTATION SPEED</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.05rem', color: '#F4F1EA' }}>
+          <div className="type-level-05" style={{ color: '#914354', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Gauge size={12} style={{ color: '#DB1A1A' }} />
+            <span>ROTATION SPEED</span>
+          </div>
+          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.05rem', color: '#F4F1EA', marginTop: '4px' }}>
             {controlState.speed.toFixed(1)}x
           </div>
         </div>
+
         <div style={{ background: '#3C0810', color: '#F4F1EA', padding: '14px', borderLeft: '3px solid #812033' }}>
-          <div className="type-level-05" style={{ color: '#914354' }}>PHASE LOCK</div>
-          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.05rem', color: '#F4F1EA' }}>
+          <div className="type-level-05" style={{ color: '#914354', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Clock size={12} style={{ color: '#DB1A1A' }} />
+            <span>PHASE LOCK</span>
+          </div>
+          <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.05rem', color: '#F4F1EA', marginTop: '4px' }}>
             0{controlState.phase}
           </div>
         </div>
@@ -472,7 +593,10 @@ const ControlDashboard = memo(function ControlDashboard({
       <div style={{ display: 'grid', gap: '20px' }}>
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span className="type-level-05">ENERGY RESONANCE AMPLITUDE</span>
+            <span className="type-level-05" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Zap size={12} style={{ color: '#DB1A1A' }} />
+              <span>ENERGY RESONANCE AMPLITUDE</span>
+            </span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#580D18', fontWeight: 700 }}>
               {controlState.energy}%
             </span>
@@ -491,7 +615,10 @@ const ControlDashboard = memo(function ControlDashboard({
 
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span className="type-level-05">TEMPORAL ROTATION VELOCITY</span>
+            <span className="type-level-05" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <FastForward size={12} style={{ color: '#DB1A1A' }} />
+              <span>TEMPORAL ROTATION VELOCITY</span>
+            </span>
             <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#580D18', fontWeight: 700 }}>
               {controlState.speed.toFixed(1)}x
             </span>
@@ -542,9 +669,14 @@ const ControlDashboard = memo(function ControlDashboard({
                 boxShadow: isStabilizeActive ? '0 6px 20px rgba(219, 26, 26, 0.4)' : 'none',
                 transform: isStabilizeActive ? 'translateY(-2px)' : 'none',
                 cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
               }}
             >
-              {isStabilizeActive ? '● STABILIZE' : 'STABILIZE CORE'}
+              <Shield size={11} />
+              <span>{isStabilizeActive ? 'STABILIZED' : 'STABILIZE'}</span>
             </button>
 
             <button
@@ -566,9 +698,14 @@ const ControlDashboard = memo(function ControlDashboard({
                 boxShadow: isMaximizeActive ? '0 6px 20px rgba(219, 26, 26, 0.4)' : 'none',
                 transform: isMaximizeActive ? 'translateY(-2px)' : 'none',
                 cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
               }}
             >
-              {isMaximizeActive ? '● MAXIMIZE' : 'MAXIMIZE FLUX'}
+              <Zap size={11} />
+              <span>{isMaximizeActive ? 'MAXIMIZED' : 'MAXIMIZE'}</span>
             </button>
 
             <button
@@ -590,9 +727,14 @@ const ControlDashboard = memo(function ControlDashboard({
                 boxShadow: isZeroDriftActive ? '0 6px 20px rgba(219, 26, 26, 0.4)' : 'none',
                 transform: isZeroDriftActive ? 'translateY(-2px)' : 'none',
                 cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
               }}
             >
-              {isZeroDriftActive ? '● ZERO DRIFT' : 'ZERO DRIFT'}
+              <Target size={11} />
+              <span>{isZeroDriftActive ? 'ZERO DRIFT' : 'ZERO DRIFT'}</span>
             </button>
           </div>
         </div>
@@ -626,7 +768,10 @@ export default function ScrollStages({
           {activeNodeData && (
             <div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                <span className="type-level-05" style={{ color: '#DB1A1A' }}>NODE DIAGNOSTIC INSPECTION</span>
+                <span className="type-level-05" style={{ color: '#DB1A1A', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <Terminal size={14} />
+                  <span>NODE DIAGNOSTIC INSPECTION</span>
+                </span>
                 <span style={{ height: '1px', flex: 1, background: 'rgba(219,26,26,0.2)' }} />
                 <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#DB1A1A', opacity: 0.8 }}>
                   [{String(activeNodeData.id + 1).padStart(2, '0')}] {activeNodeData.subtitle}
@@ -650,8 +795,9 @@ export default function ScrollStages({
               </p>
 
               <div style={{ borderTop: '1px solid rgba(88,13,24,0.15)', paddingTop: '24px', marginBottom: '32px' }}>
-                <div className="type-level-05" style={{ marginBottom: '18px', color: '#DB1A1A' }}>
-                  TELEMETRY PARAMETERS
+                <div className="type-level-05" style={{ marginBottom: '18px', color: '#DB1A1A', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Activity size={13} />
+                  <span>TELEMETRY PARAMETERS</span>
                 </div>
                 <div style={{
                   display: 'grid',
@@ -686,7 +832,10 @@ export default function ScrollStages({
                   onMouseLeave={() => onCursorState?.('default')}
                   style={{ flex: 1, justifyContent: 'center', padding: '12px 14px', fontSize: '0.68rem' }}
                 >
-                  <span>← PREV NODE</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <ArrowLeft size={14} />
+                    <span>PREV NODE</span>
+                  </span>
                 </button>
                 <button
                   className="btn-rect btn-rect-secondary"
@@ -695,7 +844,10 @@ export default function ScrollStages({
                   onMouseLeave={() => onCursorState?.('default')}
                   style={{ flex: 1, justifyContent: 'center', padding: '12px 14px', fontSize: '0.68rem' }}
                 >
-                  <span>NEXT NODE →</span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                    <span>NEXT NODE</span>
+                    <ArrowRight size={14} />
+                  </span>
                 </button>
               </div>
 
@@ -707,7 +859,9 @@ export default function ScrollStages({
                 style={{ width: '100%', justifyContent: 'center' }}
               >
                 <span>RETURN TO SYSTEM VIEW</span>
-                <span className="btn-arrow">→</span>
+                <span className="btn-arrow">
+                  <ArrowRight size={16} />
+                </span>
               </button>
             </div>
           )}
@@ -725,7 +879,10 @@ export default function ScrollStages({
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-              <span className="type-level-05" style={{ color: '#DB1A1A' }}>CLASSIFIED DOSSIER</span>
+              <span className="type-level-05" style={{ color: '#DB1A1A', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <ShieldAlert size={14} />
+                <span>CLASSIFIED DOSSIER</span>
+              </span>
               <span style={{ height: '1px', flex: 1, background: 'rgba(219,26,26,0.2)' }} />
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#DB1A1A', opacity: 0.8 }}>CODEX ΩΩ-7</span>
             </div>
@@ -788,7 +945,9 @@ export default function ScrollStages({
               style={{ width: '100%', justifyContent: 'center' }}
             >
               <span>CLOSE DOSSIER</span>
-              <span className="btn-arrow">→</span>
+              <span className="btn-arrow">
+                <X size={16} />
+              </span>
             </button>
           </div>
         </div>
@@ -805,18 +964,19 @@ export default function ScrollStages({
         pointerEvents: 'none',
       }}>
         <div style={{ position: 'relative', zIndex: 6, maxWidth: '780px', pointerEvents: 'auto' }}>
-          <div className="type-level-05" style={{ marginBottom: '20px' }}>
-            STAGE 01 // DISCOVER
+          <div className="hud-pill" style={{ marginBottom: '20px' }}>
+            <Sparkles size={13} style={{ color: '#DB1A1A' }} />
+            <span>STAGE 01 // DISCOVER</span>
           </div>
 
-          <h1 className="type-level-01" style={{ marginBottom: '24px', color: '#DB1A1A' }}>
+          <h1 className="type-level-01 text-gradient-crimson" style={{ marginBottom: '24px' }}>
             CHRONOS<br />
             <span style={{ borderBottom: '3px solid #DB1A1A', paddingBottom: '4px', display: 'inline-block' }}>
               ENGINE
             </span>
           </h1>
 
-          <h2 className="type-level-03" style={{ marginBottom: '20px', color: '#DB1A1A', fontWeight: 600 }}>
+          <h2 className="type-level-03 text-gradient-crimson" style={{ marginBottom: '20px', fontWeight: 600 }}>
             A SYSTEM BUILT AROUND TIME.
           </h2>
 
@@ -825,38 +985,17 @@ export default function ScrollStages({
           </p>
 
           <div style={{ display: 'flex', gap: '12px', marginBottom: '32px', flexWrap: 'wrap' }}>
-            <span style={{
-              background: 'rgba(219,26,26,0.06)',
-              border: '1px solid rgba(219,26,26,0.25)',
-              padding: '6px 12px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.65rem',
-              color: '#DB1A1A',
-              fontWeight: 700
-            }}>
-              7.83 Hz SCHUMANN
+            <span className="hud-pill">
+              <Activity size={12} />
+              <span>7.83 Hz SCHUMANN</span>
             </span>
-            <span style={{
-              background: 'rgba(60,8,16,0.04)',
-              border: '1px solid rgba(88,13,24,0.15)',
-              padding: '6px 12px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.65rem',
-              color: '#580D18',
-              fontWeight: 700
-            }}>
-              94.2 TW FLUX
+            <span className="hud-pill" style={{ background: 'rgba(60,8,16,0.06)', borderColor: 'rgba(88,13,24,0.22)' }}>
+              <Zap size={12} style={{ color: '#DB1A1A' }} />
+              <span>94.2 TW FLUX</span>
             </span>
-            <span style={{
-              background: 'rgba(60,8,16,0.04)',
-              border: '1px solid rgba(88,13,24,0.15)',
-              padding: '6px 12px',
-              fontFamily: 'var(--font-mono)',
-              fontSize: '0.65rem',
-              color: '#580D18',
-              fontWeight: 700
-            }}>
-              IOR 1.650 REFRACTION
+            <span className="hud-pill" style={{ background: 'rgba(60,8,16,0.06)', borderColor: 'rgba(88,13,24,0.22)' }}>
+              <Eye size={12} style={{ color: '#DB1A1A' }} />
+              <span>IOR 1.650 REFRACTION</span>
             </span>
           </div>
 
@@ -868,11 +1007,14 @@ export default function ScrollStages({
               onMouseLeave={() => onCursorState?.('default')}
             >
               <span>ENTER SYSTEM</span>
-              <span className="btn-arrow">→</span>
+              <span className="btn-arrow">
+                <ArrowRight size={16} />
+              </span>
             </a>
 
-            <span className="type-level-05" style={{ opacity: 0.7 }}>
-              SCROLL TO ACTIVATE
+            <span className="type-level-05" style={{ opacity: 0.7, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <span>SCROLL TO ACTIVATE</span>
+              <ChevronDown size={14} style={{ color: '#DB1A1A' }} />
             </span>
           </div>
         </div>
@@ -890,12 +1032,7 @@ export default function ScrollStages({
           pointerEvents: 'none',
         }}>
           <span className="type-level-05" style={{ fontSize: '0.6rem' }}>SCROLL TO ENGAGE</span>
-          <div style={{
-            width: '1.5px',
-            height: '42px',
-            background: 'linear-gradient(to bottom, #6E1422, transparent)',
-            animation: 'scrollPulse 2s ease-in-out infinite',
-          }} />
+          <ChevronDown size={22} style={{ color: '#DB1A1A' }} className="icon-pulse-glow" />
         </div>
       </section>
 
@@ -1123,8 +1260,9 @@ export default function ScrollStages({
         }} />
 
         <div style={{ position: 'relative', zIndex: 6, maxWidth: '680px', padding: '0 24px' }}>
-          <div className="type-level-05" style={{ marginBottom: '24px' }}>
-            STAGE 07 // RESOLVE
+          <div className="type-level-05" style={{ marginBottom: '24px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Sparkles size={13} style={{ color: '#DB1A1A' }} />
+            <span>STAGE 07 // RESOLVE</span>
           </div>
 
           <h2 className="type-level-01" style={{ fontSize: 'clamp(3rem, 7.5vw, 7rem)', marginBottom: '24px' }}>
@@ -1137,28 +1275,41 @@ export default function ScrollStages({
 
           <div style={{ display: 'flex', gap: '20px', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '48px' }}>
             <button
-              className="btn-rect"
+              className="cta-primary"
               onClick={() => setIsSpecDrawerOpen(true)}
               onMouseEnter={() => onCursorState?.('hover')}
               onMouseLeave={() => onCursorState?.('default')}
             >
+              <Zap size={15} />
               <span>ENGAGE CORE</span>
-              <span className="btn-arrow">→</span>
+              <span className="cta-icon-arrow">
+                <ArrowRight size={16} />
+              </span>
             </button>
             <button
-              className="btn-rect btn-rect-secondary"
+              className="cta-secondary"
               onClick={() => setIsSpecDrawerOpen(true)}
               onMouseEnter={() => onCursorState?.('hover')}
               onMouseLeave={() => onCursorState?.('default')}
             >
+              <FileText size={15} />
               <span>VIEW SPECIFICATIONS</span>
             </button>
           </div>
 
-          <div style={{ display: 'flex', gap: '32px', justifyContent: 'center' }}>
-            {['BUILD ΩΩ-7', 'SCHUMANN 7.83 Hz', 'PHASE COHERENT'].map((tag) => (
-              <span key={tag} className="type-level-05" style={{ opacity: 0.6 }}>{tag}</span>
-            ))}
+          <div style={{ display: 'flex', gap: '32px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <span className="type-level-05" style={{ opacity: 0.8, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Cpu size={12} style={{ color: '#DB1A1A' }} />
+              <span>BUILD ΩΩ-7</span>
+            </span>
+            <span className="type-level-05" style={{ opacity: 0.8, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Activity size={12} style={{ color: '#DB1A1A' }} />
+              <span>SCHUMANN 7.83 Hz</span>
+            </span>
+            <span className="type-level-05" style={{ opacity: 0.8, display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <CheckCircle2 size={12} style={{ color: '#DB1A1A' }} />
+              <span>PHASE COHERENT</span>
+            </span>
           </div>
         </div>
       </section>

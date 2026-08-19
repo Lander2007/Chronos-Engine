@@ -259,15 +259,34 @@ const WorldNodeMarkers = memo(function WorldNodeMarkers({
               <div
                 className={`node-marker-badge ${isSelected ? 'selected' : ''}`}
                 style={{
-                  opacity: isSelected ? 1 : isCurrentStageNode ? 0.95 : 0.4,
+                  opacity: isSelected ? 1 : isCurrentStageNode ? 0.95 : 0.45,
                   transform: isSelected ? 'scale(1.12)' : 'scale(1)',
                 }}
                 onClick={() => onSelectNode(isSelected ? null : node.id)}
                 onMouseEnter={handlePointerOver}
                 onMouseLeave={handlePointerOut}
               >
-                <span className="node-pulse-dot" />
+                {isSelected ? (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#F4F1EA" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-pulse-glow">
+                    <path d="M4.9 19.1C1.9 16.1 1.9 11.4 4.9 8.5" />
+                    <path d="M7.8 16.2c-1.6-1.6-1.6-4.1 0-5.7" />
+                    <circle cx="12" cy="12" r="2" />
+                    <path d="M16.2 10.5c1.6 1.6 1.6 4.1 0 5.7" />
+                    <path d="M19.1 7.6c3 3 3 7.7 0 10.6" />
+                  </svg>
+                ) : (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={isCurrentStageNode ? '#DB1A1A' : '#580D18'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="22" x2="18" y1="12" y2="12" />
+                    <line x1="6" x2="2" y1="12" y2="12" />
+                    <line x1="12" x2="12" y1="6" y2="2" />
+                    <line x1="12" x2="12" y1="22" y2="18" />
+                  </svg>
+                )}
                 <span>[{String(node.id + 1).padStart(2, '0')}] {node.title}</span>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: isSelected ? 1 : 0.5, transform: isSelected ? 'translateX(2px)' : 'none' }}>
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
               </div>
             </Html>
           </mesh>

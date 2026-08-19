@@ -1,6 +1,21 @@
 import { useState, useEffect, useRef, useCallback, Suspense, memo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import * as THREE from 'three'
+import {
+  Compass,
+  BookOpen,
+  Cpu,
+  Crosshair,
+  RotateCw,
+  Sliders,
+  Sparkles,
+  ArrowRight,
+  Volume2,
+  VolumeX,
+  Clock,
+  Activity,
+  ChevronRight,
+} from './components/Icons'
 import Crystal3D from './Crystal3D'
 import ScrollStages from './ScrollStages'
 
@@ -51,13 +66,13 @@ const PrecisionCursor = memo(function PrecisionCursor({ cursorState }: { cursorS
 
 // 7 Narrative Stage Rail Data
 const NAV_STAGES = [
-  { id: 'stage-1', num: '01', label: 'Discover' },
-  { id: 'stage-2', num: '02', label: 'Origin' },
-  { id: 'stage-3', num: '03', label: 'Architecture' },
-  { id: 'stage-4', num: '04', label: 'Nodes' },
-  { id: 'stage-5', num: '05', label: 'Mechanics' },
-  { id: 'stage-6', num: '06', label: 'Control' },
-  { id: 'stage-7', num: '07', label: 'Resolve' },
+  { id: 'stage-1', num: '01', label: 'Discover', Icon: Compass },
+  { id: 'stage-2', num: '02', label: 'Origin', Icon: BookOpen },
+  { id: 'stage-3', num: '03', label: 'Architecture', Icon: Cpu },
+  { id: 'stage-4', num: '04', label: 'Nodes', Icon: Crosshair },
+  { id: 'stage-5', num: '05', label: 'Mechanics', Icon: RotateCw },
+  { id: 'stage-6', num: '06', label: 'Control', Icon: Sliders },
+  { id: 'stage-7', num: '07', label: 'Resolve', Icon: Sparkles },
 ]
 
 const VerticalTrackNav = memo(function VerticalTrackNav({
@@ -77,6 +92,8 @@ const VerticalTrackNav = memo(function VerticalTrackNav({
     <nav className="nav-track" aria-label="Chronos Engine Navigation">
       {NAV_STAGES.map((stage, idx) => {
         const isActive = activeStageIndex === idx
+        const StageIcon = stage.Icon
+
         return (
           <button
             key={stage.id}
@@ -86,8 +103,10 @@ const VerticalTrackNav = memo(function VerticalTrackNav({
             className={`nav-track-node ${isActive ? 'active' : ''}`}
             title={stage.label}
           >
-            <span className="nav-track-label">
-              {stage.label}
+            <span className="nav-track-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <StageIcon size={12} style={{ color: isActive ? '#DB1A1A' : '#580D18' }} />
+              <span>{stage.label}</span>
+              <ChevronRight size={10} style={{ opacity: isActive ? 1 : 0.4, transform: isActive ? 'translateX(2px)' : 'none', transition: 'all 0.25s ease' }} />
             </span>
             <span className="nav-track-num">
               {stage.num}
@@ -136,10 +155,14 @@ const GlobalHeader = memo(function GlobalHeader({
 
       <header className="global-header">
         <div className="brand-badge">
-          <div className="brand-dot" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Activity size={16} className="icon-pulse-glow" style={{ color: '#DB1A1A' }} />
+            <div className="brand-dot" />
+          </div>
           <span className="brand-title">CHRONOS ENGINE</span>
-          <span className="header-meta" style={{ marginLeft: '4px' }}>
-            EPOCH {timeStr}
+          <span className="header-meta" style={{ marginLeft: '6px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Clock size={11} style={{ color: '#DB1A1A', opacity: 0.8 }} />
+            <span>EPOCH {timeStr}</span>
           </span>
         </div>
 
@@ -149,10 +172,10 @@ const GlobalHeader = memo(function GlobalHeader({
             onMouseEnter={() => onCursorState('hover')}
             onMouseLeave={() => onCursorState('default')}
             style={{
-              background: 'transparent',
-              border: '1px solid rgba(219,26,26,0.3)',
-              color: isAudioOn ? '#DB1A1A' : 'rgba(88,13,24,0.6)',
-              padding: '6px 12px',
+              background: isAudioOn ? 'rgba(219,26,26,0.08)' : 'transparent',
+              border: '1px solid ' + (isAudioOn ? '#DB1A1A' : 'rgba(88,13,24,0.3)'),
+              color: isAudioOn ? '#DB1A1A' : 'rgba(88,13,24,0.7)',
+              padding: '6px 14px',
               fontFamily: 'var(--font-mono)',
               fontSize: '0.62rem',
               letterSpacing: '0.12em',
@@ -160,16 +183,20 @@ const GlobalHeader = memo(function GlobalHeader({
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
+              boxShadow: isAudioOn ? '0 0 16px rgba(219,26,26,0.2)' : 'none',
             }}
           >
             {isAudioOn ? (
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: '10px' }}>
-                <span className="eq-bar eq-bar-1" />
-                <span className="eq-bar eq-bar-2" />
-                <span className="eq-bar eq-bar-3" />
-              </div>
+              <>
+                <Volume2 size={13} style={{ color: '#DB1A1A' }} />
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2px', height: '10px' }}>
+                  <span className="eq-bar eq-bar-1" />
+                  <span className="eq-bar eq-bar-2" />
+                  <span className="eq-bar eq-bar-3" />
+                </div>
+              </>
             ) : (
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(88,13,24,0.3)' }} />
+              <VolumeX size={13} style={{ opacity: 0.6 }} />
             )}
             <span>SOUND: {isAudioOn ? 'ON (7.83Hz)' : 'OFF'}</span>
           </button>
@@ -216,12 +243,13 @@ const InitialLoader = memo(function InitialLoader({
     <div className={`loader-overlay ${isDismissed ? 'dismissed' : ''}`}>
       <div style={{ maxWidth: '440px', width: '100%', textAlign: 'center' }}>
         <div className="brand-badge" style={{ justifyContent: 'center', marginBottom: '24px' }}>
-          <div className="brand-dot" />
+          <Sparkles size={20} className="icon-pulse-glow" style={{ color: '#DB1A1A' }} />
           <span className="brand-title" style={{ fontSize: '1.1rem' }}>CHRONOS ENGINE</span>
         </div>
 
-        <p className="type-level-05" style={{ marginBottom: '32px' }}>
-          INITIALIZING NON-EUCLIDEAN TEMPORAL ARTIFACT
+        <p className="type-level-05" style={{ marginBottom: '32px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <Activity size={13} className="icon-pulse-glow" />
+          <span>INITIALIZING NON-EUCLIDEAN TEMPORAL ARTIFACT</span>
         </p>
 
         <div style={{ height: '3px', background: 'rgba(88,13,24,0.15)', marginBottom: '16px', position: 'relative', overflow: 'hidden' }}>
@@ -249,7 +277,9 @@ const InitialLoader = memo(function InitialLoader({
             style={{ width: '100%', justifyContent: 'center' }}
           >
             <span>ENTER SYSTEM</span>
-            <span className="btn-arrow">→</span>
+            <span className="btn-arrow">
+              <ArrowRight size={16} />
+            </span>
           </button>
         )}
       </div>
