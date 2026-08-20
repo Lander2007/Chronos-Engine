@@ -83,7 +83,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  user-select: none;
+  user-select: text;
 }
 
 /* Hide scrollbar while preserving smooth scrolling */
@@ -91,7 +91,9 @@ body {
 html { scrollbar-width: none; }
 
 /* Dynamic Custom Precision Cursor */
-* { cursor: none !important; }
+@media (hover: hover) and (pointer: fine) {
+  * { cursor: none !important; }
+}
 
 .cursor-dot {
   position: fixed;
@@ -108,6 +110,13 @@ html { scrollbar-width: none; }
               height 0.2s cubic-bezier(0.16, 1, 0.3, 1),
               background-color 0.2s ease,
               border-radius 0.2s ease;
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .cursor-dot,
+  .cursor-trail {
+    display: none !important;
+  }
 }
 
 .cursor-trail {
@@ -1999,14 +2008,12 @@ button[style] {
   }
   
   /* Remove spinning animations */
-  .icon-spin-slow,
-  @keyframes iconSpin {
+  .icon-spin-slow {
     animation: none !important;
   }
   
   /* Reduce pulse/glow effects */
-  .icon-pulse-glow,
-  @keyframes iconGlow {
+  .icon-pulse-glow {
     animation: none !important;
     opacity: 1 !important;
     filter: none !important;

@@ -77,6 +77,7 @@ interface Crystal3DProps {
   controlState?: { energy: number speed: number phase: number }
   onCursorState?: (state: "default" | "hover" | "node") => void
   prefersReducedMotion?: boolean
+  renderQuality?: "high" | "balanced" | "low"
 }
 
 // Module-scoped reusable vector instances
@@ -256,11 +257,13 @@ const NodeConnections = memo(function NodeConnections() {
 // Data Stream Particles
 const DataStreamParticles = memo(function DataStreamParticles({
   selectedNode,
+  renderQuality,
 }: {
   selectedNode: number | null
+  renderQuality: "high" | "balanced" | "low"
 }) {
   const meshRef = useRef<THREE.InstancedMesh>(null)
-  const count = 80
+  const count = renderQuality === "low" ? 24 : renderQuality === "balanced" ? 48 : 80
 
   const particles = useMemo(() => {
     return [...Array(count)].map(() => ({
@@ -301,8 +304,12 @@ const DataStreamParticles = memo(function DataStreamParticles({
 })
 
 // Instanced Dust Ring
-const InstancedDustRing = memo(function InstancedDustRing() {
-  const count = 220
+const InstancedDustRing = memo(function InstancedDustRing({
+  renderQuality,
+}: {
+  renderQuality: "high" | "balanced" | "low"
+}) {
+  const count = renderQuality === "low" ? 70 : renderQuality === "balanced" ? 120 : 220
   const meshRef = useRef<THREE.InstancedMesh>(null)
 
   const particles = useMemo(() => {
@@ -488,6 +495,7 @@ export default function Crystal3D({
   controlState = { energy: 72, speed: 1.0, phase: 4 },
   onCursorState,
   prefersReducedMotion = false,
+  renderQuality = "high",
 }: Crystal3DProps) {
   const crystalRef = useRef<THREE.Mesh>(null)
   const coreRef = useRef<THREE.Mesh>(null)
@@ -588,7 +596,7 @@ export default function Crystal3D({
       <group ref={groupRef}>
         <ParallaxShapes scrollProgress={currentScrollProgress} />
         <NodeConnections />
-        <DataStreamParticles selectedNode={selectedNode} />
+        <DataStreamParticles selectedNode={selectedNode} renderQuality={renderQuality} />
 
         <mesh ref={crystalRef} geometry={crystalGeo} castShadow>
           <shaderMaterial
@@ -611,7 +619,7 @@ export default function Crystal3D({
           />
         </mesh>
 
-        <InstancedDustRing />
+        <InstancedDustRing renderQuality={renderQuality} />
 
         <WorldNodeMarkers
           activeStage={activeStage}

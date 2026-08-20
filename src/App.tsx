@@ -24,6 +24,8 @@ import {
 const Crystal3D = lazy(() => import("./Crystal3D"))
 const ScrollStages = lazy(() => import("./ScrollStages"))
 
+type RenderQuality = "high" | "balanced" | "low"
+
 // Precision cursor with dynamic states (Memoized)
 const PrecisionCursor = memo(function PrecisionCursor({
   cursorState,
@@ -485,6 +487,7 @@ export default function App() {
   
   // Check for reduced motion preference
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+  const [renderQuality, setRenderQuality] = useState<RenderQuality>("high")
 
   const [controlState, setControlState] = useState({
     energy: 72,
@@ -508,6 +511,22 @@ export default function App() {
     
     mediaQuery.addEventListener('change', handleChange)
     return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
+  useEffect(() => {
+    const connection = (
+      navigator as Navigator & {
+        connection?: { saveData?: boolean }
+      }
+    ).connection
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory
+    const isSmallScreen = window.matchMedia("(max-width: 720px)").matches
+    const isLowPower =
+      connection?.saveData === true ||
+      (deviceMemory !== undefined && deviceMemory <= 4) ||
+      navigator.hardwareConcurrency <= 4
+
+    setRenderQuality(isLowPower ? "low" : isSmallScreen ? "balanced" : "high")
   }, [])
 
   const updateControlState = useCallback(
@@ -578,6 +597,11 @@ export default function App() {
 
   // Initialize Lenis smooth scroll
   useEffect(() => {
+    if (prefersReducedMotion) {
+      onScroll()
+      return
+    }
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -601,7 +625,7 @@ export default function App() {
     return () => {
       lenis.destroy()
     }
-  }, [onScroll])
+  }, [onScroll, prefersReducedMotion])
 
   // Keyboard Escape shortcut listener to close open node or modal
   useEffect(() => {
@@ -616,6 +640,8 @@ export default function App() {
 
   const isHighDPI =
     typeof window !== "undefined" && window.devicePixelRatio > 1.5
+  const canvasDpr =
+    renderQuality === "low" ? 1 : renderQuality === "balanced" ? 1.15 : Math.min(window.devicePixelRatio || 1, 1.5)
 
   return (
     <div
@@ -669,14 +695,15 @@ export default function App() {
         <Canvas
           camera={{ position: [0, 0, 6], fov: 45 }}
           gl={{
-            antialias: !isHighDPI,
+            antialias: renderQuality !== "low" && !isHighDPI,
             alpha: true,
             toneMapping: THREE.ACESFilmicToneMapping,
             toneMappingExposure: 1.15,
             powerPreference: "high-performance",
           }}
           style={{ background: "transparent" }}
-          dpr={[1, Math.min(window.devicePixelRatio || 1, 1.5)]}
+          dpr={[1, canvasDpr]}
+          performance={{ min: renderQuality === "low" ? 0.5 : 0.7 }}
         >
           <Suspense fallback={null}>
             <Crystal3D
@@ -687,6 +714,7 @@ export default function App() {
               controlState={controlState}
               onCursorState={setCursorState}
               prefersReducedMotion={prefersReducedMotion}
+              renderQuality={renderQuality}
             />
           </Suspense>
         </Canvas>
