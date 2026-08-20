@@ -102,7 +102,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  user-select: text;
+  user-select: none;
 }
 
 /* Hide scrollbar while preserving smooth scrolling */
@@ -110,9 +110,7 @@ body {
 html { scrollbar-width: none; }
 
 /* Dynamic Custom Precision Cursor */
-@media (hover: hover) and (pointer: fine) {
-  * { cursor: none !important; }
-}
+* { cursor: none !important; }
 
 .cursor-dot {
   position: fixed;
@@ -133,13 +131,6 @@ html { scrollbar-width: none; }
               margin 0.2s cubic-bezier(0.16, 1, 0.3, 1),
               background-color 0.2s ease,
               border-radius 0.2s ease;
-}
-
-@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
-  .cursor-dot,
-  .cursor-trail {
-    display: none !important;
-  }
 }
 
 .cursor-trail {
@@ -1105,7 +1096,7 @@ body.in-field-note .mobile-stage-bar {
 
 .temporal-field-item.active .temporal-field-body,
 .temporal-field-item:hover .temporal-field-body {
-  color: rgba(184, 134, 11, 0.85);
+  color: rgba(212, 175, 55, 0.85);
 }
 
 /* Floating corner accent on active items */
