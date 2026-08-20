@@ -7,9 +7,13 @@ import {
   memo,
   lazy,
 } from "react"
+
 import { Canvas } from "@react-three/fiber"
+
 import * as THREE from "three"
+
 import Lenis from "lenis"
+
 import {
   Compass,
   BookOpen,
@@ -31,27 +35,37 @@ import {
 import { useMagneticHover } from "./hooks/useMagneticHover"
 
 // Lazy-load the heavy 3D component to defer 600KB+ three.js bundle
+
 const Crystal3D = lazy(() => import("./Crystal3D"))
+
 const ScrollStages = lazy(() => import("./ScrollStages"))
 
 type RenderQuality = "high" | "balanced" | "low"
 
 // Precision cursor with dynamic states (Memoized)
+
 const PrecisionCursor = memo(function PrecisionCursor({
   cursorState,
+
   prefersReducedMotion,
 }: {
   cursorState: "default" | "hover" | "node"
+
   prefersReducedMotion: boolean
 }) {
   const dotRef = useRef<HTMLDivElement>(null)
+
   const ringRef = useRef<HTMLDivElement>(null)
+
   const mousePos = useRef({ x: -100, y: -100 })
+
   const ringPos = useRef({ x: -100, y: -100 })
 
   // Sync cursor state attribute to document body for global CSS targeting
+
   useEffect(() => {
     document.body.setAttribute("data-cursor-state", cursorState)
+
     return () => {
       document.body.removeAttribute("data-cursor-state")
     }
@@ -60,32 +74,41 @@ const PrecisionCursor = memo(function PrecisionCursor({
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY }
+
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
       }
+
       if (prefersReducedMotion && ringRef.current) {
         ringRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
       }
     }
+
     window.addEventListener("mousemove", handleMouseMove)
 
     let rafId: number
+
     const animateRing = () => {
       if (!prefersReducedMotion) {
         const lerp = 0.2
+
         ringPos.current.x += (mousePos.current.x - ringPos.current.x) * lerp
+
         ringPos.current.y += (mousePos.current.y - ringPos.current.y) * lerp
 
         if (ringRef.current) {
           ringRef.current.style.transform = `translate3d(${ringPos.current.x.toFixed(2)}px, ${ringPos.current.y.toFixed(2)}px, 0)`
         }
       }
+
       rafId = requestAnimationFrame(animateRing)
     }
+
     rafId = requestAnimationFrame(animateRing)
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove)
+
       cancelAnimationFrame(rafId)
     }
   }, [prefersReducedMotion])
@@ -107,32 +130,50 @@ const PrecisionCursor = memo(function PrecisionCursor({
 })
 
 // 7 Narrative & Technical Scroll Stages Data
+
 const NAV_STAGES = [
   { id: "stage-1", num: "01", label: "Discover", Icon: Compass },
+
   { id: "stage-2", num: "02", label: "Origin", Icon: BookOpen },
+
   { id: "stage-3", num: "03", label: "Architecture", Icon: Cpu },
+
   { id: "stage-4", num: "04", label: "Nodes", Icon: Crosshair },
+
   { id: "stage-5", num: "05", label: "Mechanics", Icon: RotateCw },
+
   { id: "stage-6", num: "06", label: "Control", Icon: Sliders },
+
   { id: "stage-7", num: "07", label: "Resolve", Icon: Sparkles },
 ]
 
 // Single Nav Track Node Item with magnetic hover
+
 const NavTrackItem = memo(function NavTrackItem({
   stage,
+
   idx,
+
   activeStageIndex,
+
   scrollToStage,
+
   onCursorState,
 }: {
   stage: typeof NAV_STAGES[number]
+
   idx: number
+
   activeStageIndex: number
+
   scrollToStage: (idx: number) => void
+
   onCursorState: (state: "default" | "hover" | "node") => void
 }) {
   const isActive = activeStageIndex === idx
+
   const StageIcon = stage.Icon
+
   const btnRef = useMagneticHover<HTMLButtonElement>(null, 6)
 
   return (
@@ -148,7 +189,9 @@ const NavTrackItem = memo(function NavTrackItem({
         className="nav-track-label"
         style={{
           display: "inline-flex",
+
           alignItems: "center",
+
           gap: "6px",
         }}
       >
@@ -161,7 +204,9 @@ const NavTrackItem = memo(function NavTrackItem({
           size={10}
           style={{
             opacity: isActive ? 1 : 0.4,
+
             transform: isActive ? "translateX(2px)" : "none",
+
             transition: "all 0.25s ease",
           }}
         />
@@ -173,18 +218,24 @@ const NavTrackItem = memo(function NavTrackItem({
 })
 
 // Desktop Stage Navigation Track (Memoized)
+
 const NavTrack = memo(function NavTrack({
   activeStageIndex,
+
   onCursorState,
 }: {
   activeStageIndex: number
+
   onCursorState: (state: "default" | "hover" | "node") => void
 }) {
   const scrollToStage = (index: number) => {
     const targetIdx = Math.max(0, Math.min(NAV_STAGES.length - 1, index))
+
     const totalHeight =
       document.documentElement.scrollHeight - window.innerHeight
+
     const targetY = (targetIdx / (NAV_STAGES.length - 1)) * totalHeight
+
     window.scrollTo({ top: targetY, behavior: "smooth" })
   }
 
@@ -205,21 +256,28 @@ const NavTrack = memo(function NavTrack({
 })
 
 // Mobile Quick Stage Ticker Bar (Memoized)
+
 const MobileStageBar = memo(function MobileStageBar({
   activeStageIndex,
+
   onCursorState,
 }: {
   activeStageIndex: number
+
   onCursorState: (state: "default" | "hover" | "node") => void
 }) {
   const currentStage = NAV_STAGES[activeStageIndex] || NAV_STAGES[0]
+
   const StageIcon = currentStage.Icon
 
   const scrollToStage = (index: number) => {
     const targetIdx = Math.max(0, Math.min(NAV_STAGES.length - 1, index))
+
     const totalHeight =
       document.documentElement.scrollHeight - window.innerHeight
+
     const targetY = (targetIdx / (NAV_STAGES.length - 1)) * totalHeight
+
     window.scrollTo({ top: targetY, behavior: "smooth" })
   }
 
@@ -230,11 +288,17 @@ const MobileStageBar = memo(function MobileStageBar({
         disabled={activeStageIndex === 0}
         style={{
           background: "transparent",
+
           border: "none",
+
           color: activeStageIndex === 0 ? "rgba(88,13,24,0.3)" : "#580D18",
+
           padding: "6px",
+
           display: "flex",
+
           alignItems: "center",
+
           cursor: activeStageIndex === 0 ? "default" : "pointer",
         }}
       >
@@ -246,9 +310,13 @@ const MobileStageBar = memo(function MobileStageBar({
         <span
           style={{
             fontFamily: "var(--font-mono)",
+
             fontSize: "0.72rem",
+
             fontWeight: 700,
+
             color: "#580D18",
+
             letterSpacing: "0.1em",
           }}
         >
@@ -261,14 +329,20 @@ const MobileStageBar = memo(function MobileStageBar({
         disabled={activeStageIndex === NAV_STAGES.length - 1}
         style={{
           background: "transparent",
+
           border: "none",
+
           color:
             activeStageIndex === NAV_STAGES.length - 1
               ? "rgba(88,13,24,0.3)"
               : "#580D18",
+
           padding: "6px",
+
           display: "flex",
+
           alignItems: "center",
+
           cursor:
             activeStageIndex === NAV_STAGES.length - 1 ? "default" : "pointer",
         }}
@@ -280,13 +354,18 @@ const MobileStageBar = memo(function MobileStageBar({
 })
 
 // Header Audio Toggle Button with magnetic hover
+
 const HeaderAudioButton = memo(function HeaderAudioButton({
   isAudioOn,
+
   onToggleAudio,
+
   onCursorState,
 }: {
   isAudioOn: boolean
+
   onToggleAudio: () => void
+
   onCursorState: (state: "default" | "hover" | "node") => void
 }) {
   const btnRef = useMagneticHover<HTMLButtonElement>(null, 4)
@@ -299,16 +378,27 @@ const HeaderAudioButton = memo(function HeaderAudioButton({
       onMouseLeave={() => onCursorState("default")}
       style={{
         background: isAudioOn ? "rgba(219,26,26,0.08)" : "transparent",
+
         border: "1px solid " + (isAudioOn ? "#DB1A1A" : "rgba(88,13,24,0.3)"),
+
         color: isAudioOn ? "#DB1A1A" : "rgba(88,13,24,0.7)",
+
         padding: "6px 14px",
+
         fontFamily: "var(--font-mono)",
+
         fontSize: "0.62rem",
+
         letterSpacing: "0.12em",
+
         transition: "all 0.25s ease",
+
         display: "flex",
+
         alignItems: "center",
+
         gap: "8px",
+
         boxShadow: isAudioOn ? "0 0 16px rgba(219,26,26,0.2)" : "none",
       }}
     >
@@ -318,8 +408,11 @@ const HeaderAudioButton = memo(function HeaderAudioButton({
           <div
             style={{
               display: "flex",
+
               alignItems: "flex-end",
+
               gap: "2px",
+
               height: "10px",
             }}
           >
@@ -339,15 +432,22 @@ const HeaderAudioButton = memo(function HeaderAudioButton({
 })
 
 // Header Navigation Bar (Memoized)
+
 const GlobalHeader = memo(function GlobalHeader({
   activeStageIndex,
+
   isAudioOn,
+
   onToggleAudio,
+
   onCursorState,
 }: {
   activeStageIndex: number
+
   isAudioOn: boolean
+
   onToggleAudio: () => void
+
   onCursorState: (state: "default" | "hover" | "node") => void
 }) {
   const [timeStr, setTimeStr] = useState("")
@@ -355,14 +455,18 @@ const GlobalHeader = memo(function GlobalHeader({
   useEffect(() => {
     const update = () => {
       const now = new Date()
+
       setTimeStr(
         now.toTimeString().split(" ")[0] +
           "." +
           String(now.getMilliseconds()).padStart(3, "0"),
       )
     }
+
     update()
+
     const timer = setInterval(update, 60)
+
     return () => clearInterval(timer)
   }, [])
 
@@ -376,11 +480,17 @@ const GlobalHeader = memo(function GlobalHeader({
             className="header-meta"
             style={{
               opacity: 0.45,
+
               fontSize: "0.62rem",
+
               fontFamily: "var(--font-mono)",
+
               marginLeft: "6px",
+
               display: "inline-flex",
+
               alignItems: "center",
+
               gap: "6px",
             }}
           >
@@ -402,16 +512,22 @@ const GlobalHeader = memo(function GlobalHeader({
 })
 
 // Branded Editorial Initial Loading Experience (Memoized)
+
 const InitialLoader = memo(function InitialLoader({
   onEnter,
+
   onCursorState,
 }: {
   onEnter: () => void
+
   onCursorState: (state: "default" | "hover" | "node") => void
 }) {
   const [progress, setProgress] = useState(0)
+
   const [isReady, setIsReady] = useState(false)
+
   const [isDismissed, setIsDismissed] = useState(false)
+
   const enterBtnRef = useMagneticHover<HTMLButtonElement>(null, 6)
 
   useEffect(() => {
@@ -419,17 +535,22 @@ const InitialLoader = memo(function InitialLoader({
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(timer)
+
           setIsReady(true)
+
           return 100
         }
+
         return prev + Math.floor(Math.random() * 16 + 8)
       })
     }, 100)
+
     return () => clearInterval(timer)
   }, [])
 
   const handleEnter = () => {
     setIsDismissed(true)
+
     setTimeout(onEnter, 800)
   }
 
@@ -456,9 +577,13 @@ const InitialLoader = memo(function InitialLoader({
           className="type-level-05"
           style={{
             marginBottom: "32px",
+
             display: "flex",
+
             alignItems: "center",
+
             justifyContent: "center",
+
             gap: "8px",
           }}
         >
@@ -469,17 +594,24 @@ const InitialLoader = memo(function InitialLoader({
         <div
           style={{
             height: "3px",
+
             background: "rgba(88,13,24,0.15)",
+
             marginBottom: "16px",
+
             position: "relative",
+
             overflow: "hidden",
           }}
         >
           <div
             style={{
               height: "100%",
+
               width: `${progress}%`,
+
               background: "#DB1A1A",
+
               transition: "width 0.15s ease-out",
             }}
           />
@@ -488,10 +620,15 @@ const InitialLoader = memo(function InitialLoader({
         <div
           style={{
             display: "flex",
+
             justifyContent: "space-between",
+
             fontFamily: "var(--font-mono)",
+
             fontSize: "0.7rem",
+
             color: "#DB1A1A",
+
             marginBottom: "40px",
           }}
         >
@@ -520,15 +657,20 @@ const InitialLoader = memo(function InitialLoader({
 })
 
 // Background Grid Texture (Memoized)
+
 const AmbientGrid = memo(function AmbientGrid() {
   return (
     <div
       className="grid-texture"
       style={{
         position: "fixed",
+
         inset: 0,
+
         pointerEvents: "none",
+
         zIndex: 0,
+
         opacity: 0.75,
       }}
     />
@@ -537,53 +679,73 @@ const AmbientGrid = memo(function AmbientGrid() {
 
 export default function App() {
   const scrollProgressRef = useRef(0)
+
   const scrollVelocityRef = useRef(0)
+
   const progressBarRef = useRef<HTMLDivElement | null>(null)
 
   const [activeStageIndex, setActiveStageIndex] = useState(0)
+
   const [selectedNode, setSelectedNode] = useState<number | null>(null)
+
   const [cursorState, setCursorState] = useState<"default" | "hover" | "node">(
     "default",
   )
+
   const [isAudioOn, setIsAudioOn] = useState(false)
+
   const [isSystemLoaded, setIsSystemLoaded] = useState(false)
 
   // Check for reduced motion preference
+
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
   const [renderQuality, setRenderQuality] = useState<RenderQuality>("high")
 
   const [controlState, setControlState] = useState({
     energy: 72,
+
     speed: 1.0,
+
     phase: 4,
   })
 
   const lastScrollY = useRef(0)
+
   const ticking = useRef(false)
+
   const audioCtxRef = useRef<AudioContext | null>(null)
+
   const oscRef = useRef<OscillatorNode | null>(null)
 
   // Detect reduced motion preference
+
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
-    setPrefersReducedMotion(mediaQuery.matches)
+
+    // FORCE DISABLE - Always set to false so animations work
+    setPrefersReducedMotion(false)
 
     const handleChange = (e: MediaQueryListEvent) => {
-      setPrefersReducedMotion(e.matches)
+      // FORCE DISABLE - Always set to false
+      setPrefersReducedMotion(false)
     }
 
     mediaQuery.addEventListener("change", handleChange)
+
     return () => mediaQuery.removeEventListener("change", handleChange)
   }, [])
 
   useEffect(() => {
-    const connection = (
-      navigator as Navigator & {
-        connection?: { saveData?: boolean }
-      }
-    ).connection
-    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean }
+    }).connection
+
+    const deviceMemory = (navigator as Navigator & { deviceMemory?: number })
+      .deviceMemory
+
     const isSmallScreen = window.matchMedia("(max-width: 720px)").matches
+
     const isLowPower =
       connection?.saveData === true ||
       (deviceMemory !== undefined && deviceMemory <= 4) ||
@@ -596,13 +758,16 @@ export default function App() {
     (newState: Partial<typeof controlState>) => {
       setControlState((prev) => ({ ...prev, ...newState }))
     },
+
     [],
   )
 
   const toggleAudio = useCallback(() => {
     if (isAudioOn) {
       oscRef.current?.stop()
+
       audioCtxRef.current?.close()
+
       setIsAudioOn(false)
     } else {
       try {
@@ -611,19 +776,27 @@ export default function App() {
           (window as unknown as { webkitAudioContext: typeof AudioContext })
             .webkitAudioContext
         )()
+
         const osc = ctx.createOscillator()
+
         const gain = ctx.createGain()
 
         osc.type = "sine"
+
         osc.frequency.setValueAtTime(7.83, ctx.currentTime)
+
         gain.gain.setValueAtTime(0.08, ctx.currentTime)
 
         osc.connect(gain)
+
         gain.connect(ctx.destination)
+
         osc.start()
 
         audioCtxRef.current = ctx
+
         oscRef.current = osc
+
         setIsAudioOn(true)
       } catch (err) {
         console.warn("AudioContext not permitted:", err)
@@ -633,55 +806,75 @@ export default function App() {
 
   const onScroll = useCallback(() => {
     const scrollY = window.scrollY
+
     if (!ticking.current) {
       requestAnimationFrame(() => {
         const docH = document.documentElement.scrollHeight - window.innerHeight
+
         const pct = docH > 0 ? scrollY / docH : 0
+
         const vel = scrollY - lastScrollY.current
+
         lastScrollY.current = scrollY
 
         scrollProgressRef.current = pct
+
         scrollVelocityRef.current = vel
 
         // Update progress bar width directly in DOM without React re-render
+
         if (progressBarRef.current) {
           progressBarRef.current.style.width = `${Math.min(pct * 100, 100)}%`
         }
 
         // Only update activeStageIndex state when passing section boundary across 7 stages
+
         const newStage = Math.min(Math.floor(pct * 6.99), 6)
+
         setActiveStageIndex((prev) => (prev !== newStage ? newStage : prev))
 
         ticking.current = false
       })
+
       ticking.current = true
     }
   }, [])
 
   // Initialize Lenis smooth scroll
+
   useEffect(() => {
     if (prefersReducedMotion) {
       onScroll()
+
       return
     }
 
     const lenis = new Lenis({
       duration: 1.2,
+
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+
       orientation: "vertical",
+
       gestureOrientation: "vertical",
+
       smoothWheel: true,
+
       wheelMultiplier: 1.0,
+
       touchMultiplier: 2,
+
       infinite: false,
     })
 
     function raf(time: number) {
       lenis.raf(time)
+
       requestAnimationFrame(raf)
     }
 
     requestAnimationFrame(raf)
+
     lenis.on("scroll", onScroll)
 
     return () => {
@@ -690,27 +883,38 @@ export default function App() {
   }, [onScroll, prefersReducedMotion])
 
   // Keyboard Escape shortcut listener to close open node or modal
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         setSelectedNode(null)
       }
     }
+
     window.addEventListener("keydown", handleKeyDown)
+
     return () => window.removeEventListener("keydown", handleKeyDown)
   }, [])
 
   const isHighDPI =
     typeof window !== "undefined" && window.devicePixelRatio > 1.5
+
   const canvasDpr =
-    renderQuality === "low" ? 1 : renderQuality === "balanced" ? 1.15 : Math.min(window.devicePixelRatio || 1, 1.5)
+    renderQuality === "low"
+      ? 1
+      : renderQuality === "balanced"
+        ? 1.15
+        : Math.min(window.devicePixelRatio || 1, 1.5)
 
   return (
     <div
       style={{
         background: "#F4F1EA",
+
         color: "#580D18",
+
         minHeight: "100vh",
+
         position: "relative",
       }}
     >
@@ -749,11 +953,17 @@ export default function App() {
       <div
         style={{
           position: "fixed",
+
           top: 0,
+
           left: 0,
+
           width: "100%",
+
           height: "100vh",
+
           zIndex: 10,
+
           pointerEvents: "none",
         }}
       >
@@ -761,9 +971,13 @@ export default function App() {
           camera={{ position: [0, 0, 6], fov: 45 }}
           gl={{
             antialias: renderQuality !== "low" && !isHighDPI,
+
             alpha: true,
+
             toneMapping: THREE.ACESFilmicToneMapping,
+
             toneMappingExposure: 1.15,
+
             powerPreference: "high-performance",
           }}
           style={{ background: "transparent" }}
