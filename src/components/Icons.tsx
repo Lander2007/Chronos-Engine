@@ -1,11 +1,17 @@
-import React from 'react'
+import React from "react"
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: number | string
   color?: string
 }
 
-export function Compass({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Compass({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -26,7 +32,13 @@ export function Compass({ size = 16, color = 'currentColor', className, style, .
   )
 }
 
-export function BookOpen({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function BookOpen({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -47,7 +59,13 @@ export function BookOpen({ size = 16, color = 'currentColor', className, style, 
   )
 }
 
-export function Cpu({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Cpu({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -69,7 +87,13 @@ export function Cpu({ size = 16, color = 'currentColor', className, style, ...pr
   )
 }
 
-export function Crosshair({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Crosshair({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -93,7 +117,13 @@ export function Crosshair({ size = 16, color = 'currentColor', className, style,
   )
 }
 
-export function RotateCw({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function RotateCw({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -114,7 +144,13 @@ export function RotateCw({ size = 16, color = 'currentColor', className, style, 
   )
 }
 
-export function Sliders({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Sliders({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -142,7 +178,13 @@ export function Sliders({ size = 16, color = 'currentColor', className, style, .
   )
 }
 
-export function Sparkles({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Sparkles({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -163,7 +205,13 @@ export function Sparkles({ size = 16, color = 'currentColor', className, style, 
   )
 }
 
-export function ArrowRight({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function ArrowRight({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -184,7 +232,13 @@ export function ArrowRight({ size = 16, color = 'currentColor', className, style
   )
 }
 
-export function ArrowLeft({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function ArrowLeft({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -205,7 +259,13 @@ export function ArrowLeft({ size = 16, color = 'currentColor', className, style,
   )
 }
 
-export function Volume2({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Volume2({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -227,7 +287,13 @@ export function Volume2({ size = 16, color = 'currentColor', className, style, .
   )
 }
 
-export function VolumeX({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function VolumeX({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -249,7 +315,13 @@ export function VolumeX({ size = 16, color = 'currentColor', className, style, .
   )
 }
 
-export function Clock({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Clock({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -270,7 +342,13 @@ export function Clock({ size = 16, color = 'currentColor', className, style, ...
   )
 }
 
-export function Activity({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Activity({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -290,7 +368,13 @@ export function Activity({ size = 16, color = 'currentColor', className, style, 
   )
 }
 
-export function ChevronRight({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function ChevronRight({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -310,7 +394,13 @@ export function ChevronRight({ size = 16, color = 'currentColor', className, sty
   )
 }
 
-export function ChevronDown({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function ChevronDown({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -330,7 +420,13 @@ export function ChevronDown({ size = 16, color = 'currentColor', className, styl
   )
 }
 
-export function ShieldAlert({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function ShieldAlert({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -352,7 +448,13 @@ export function ShieldAlert({ size = 16, color = 'currentColor', className, styl
   )
 }
 
-export function Layers({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Layers({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -374,7 +476,13 @@ export function Layers({ size = 16, color = 'currentColor', className, style, ..
   )
 }
 
-export function Globe({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Globe({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -396,7 +504,13 @@ export function Globe({ size = 16, color = 'currentColor', className, style, ...
   )
 }
 
-export function Radio({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Radio({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -420,7 +534,13 @@ export function Radio({ size = 16, color = 'currentColor', className, style, ...
   )
 }
 
-export function Eye({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Eye({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -441,7 +561,13 @@ export function Eye({ size = 16, color = 'currentColor', className, style, ...pr
   )
 }
 
-export function Zap({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Zap({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -461,7 +587,13 @@ export function Zap({ size = 16, color = 'currentColor', className, style, ...pr
   )
 }
 
-export function Maximize2({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Maximize2({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -484,7 +616,13 @@ export function Maximize2({ size = 16, color = 'currentColor', className, style,
   )
 }
 
-export function FileText({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function FileText({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -508,7 +646,13 @@ export function FileText({ size = 16, color = 'currentColor', className, style, 
   )
 }
 
-export function Target({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Target({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -530,7 +674,13 @@ export function Target({ size = 16, color = 'currentColor', className, style, ..
   )
 }
 
-export function CircleDot({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function CircleDot({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -551,7 +701,13 @@ export function CircleDot({ size = 16, color = 'currentColor', className, style,
   )
 }
 
-export function X({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function X({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -572,7 +728,13 @@ export function X({ size = 16, color = 'currentColor', className, style, ...prop
   )
 }
 
-export function RefreshCw({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function RefreshCw({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -594,7 +756,13 @@ export function RefreshCw({ size = 16, color = 'currentColor', className, style,
   )
 }
 
-export function Gauge({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Gauge({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -615,7 +783,13 @@ export function Gauge({ size = 16, color = 'currentColor', className, style, ...
   )
 }
 
-export function FastForward({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function FastForward({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -636,7 +810,13 @@ export function FastForward({ size = 16, color = 'currentColor', className, styl
   )
 }
 
-export function Shield({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Shield({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -656,7 +836,13 @@ export function Shield({ size = 16, color = 'currentColor', className, style, ..
   )
 }
 
-export function Terminal({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function Terminal({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -677,7 +863,13 @@ export function Terminal({ size = 16, color = 'currentColor', className, style, 
   )
 }
 
-export function CheckCircle2({ size = 16, color = 'currentColor', className, style, ...props }: IconProps) {
+export function CheckCircle2({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
   return (
     <svg
       width={size}
@@ -694,6 +886,33 @@ export function CheckCircle2({ size = 16, color = 'currentColor', className, sty
     >
       <circle cx="12" cy="12" r="10" />
       <path d="m9 12 2 2 4-4" />
+    </svg>
+  )
+}
+
+export function ArrowUp({
+  size = 16,
+  color = "currentColor",
+  className,
+  style,
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+      style={style}
+      {...props}
+    >
+      <line x1="12" y1="19" x2="12" y2="5" />
+      <polyline points="5 12 12 5 19 12" />
     </svg>
   )
 }

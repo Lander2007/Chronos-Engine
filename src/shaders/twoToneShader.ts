@@ -1,14 +1,14 @@
-import * as THREE from 'three'
+import * as THREE from "three"
 
 export const TwoToneShader = {
   uniforms: {
     uTime: { value: 0 },
-    uColorBg: { value: new THREE.Color('#F4F1EA') },
-    uColorCore: { value: new THREE.Color('#580D18') },
-    uColorRich: { value: new THREE.Color('#6E1422') },
-    uColorCrimson: { value: new THREE.Color('#812033') },
-    uColorDeep: { value: new THREE.Color('#3C0810') },
-    uColorDusty: { value: new THREE.Color('#914354') },
+    uColorBg: { value: new THREE.Color("#F4F1EA") },
+    uColorCore: { value: new THREE.Color("#580D18") },
+    uColorRich: { value: new THREE.Color("#6E1422") },
+    uColorCrimson: { value: new THREE.Color("#812033") },
+    uColorDeep: { value: new THREE.Color("#3C0810") },
+    uColorDusty: { value: new THREE.Color("#914354") },
     uLightPosition: { value: new THREE.Vector3(6.0, 9.0, 7.0) },
     uRimPower: { value: 2.5 },
     uEmissiveIntensity: { value: 1.0 },
@@ -91,4 +91,3 @@ export const TwoToneShader = {
     }
   `,
 }
-

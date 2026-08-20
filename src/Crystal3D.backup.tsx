@@ -1,6 +1,6 @@
-import { useRef, useMemo, useCallback, memo, useState } from "react"
+import { useRef, useMemo, useCallback, memo } from "react"
 import { useFrame } from "@react-three/fiber"
-import { Environment, Html, Line, Trail } from "@react-three/drei"
+import { Environment, Html } from "@react-three/drei"
 import { EffectComposer, Bloom } from "@react-three/postprocessing"
 import * as THREE from "three"
 import { TwoToneShader } from "./shaders/twoToneShader"
@@ -76,13 +76,13 @@ interface Crystal3DProps {
   onSelectNode: (nodeId: number | null) => void
   controlState?: { energy: number speed: number phase: number }
   onCursorState?: (state: "default" | "hover" | "node") => void
-  prefersReducedMotion?: boolean
 }
 
-// Module-scoped reusable vector instances
+// Module-scoped reusable vector instances to guarantee ZERO object allocations in useFrame
 const tempTargetPos = new THREE.Vector3()
 const tempDummyObject = new THREE.Object3D()
 
+// Build a fractured low-poly crystal with irregular facet displacement
 function buildFracturedGeometry(): THREE.BufferGeometry {
   const base = new THREE.IcosahedronGeometry(1.05, 1)
   const geo = base.index ? base.toNonIndexed() : base
@@ -113,14 +113,15 @@ function getCrystalGeo() {
   return cachedGeo
 }
 
+// 7-Stage S-curve keyframes across scroll stages: [x, y, z, scale, rotSpeed, bloomStr]
 const KEYFRAMES = [
-  { x: 1.9, y: 0.0, z: 0.0, scale: 1.55, rotSpeed: 0.005, bloom: 0.75 },
-  { x: -2.2, y: 0.3, z: 0.0, scale: 1.35, rotSpeed: 0.007, bloom: 0.85 },
-  { x: 2.1, y: -0.3, z: 0.2, scale: 1.45, rotSpeed: 0.01, bloom: 0.95 },
-  { x: 0.2, y: 0.5, z: 0.5, scale: 1.15, rotSpeed: 0.006, bloom: 1.1 },
-  { x: -2.0, y: -0.4, z: 0.1, scale: 1.5, rotSpeed: 0.012, bloom: 1.3 },
-  { x: 2.1, y: -0.7, z: 0.0, scale: 1.65, rotSpeed: 0.015, bloom: 1.45 },
-  { x: -0.6, y: 0.0, z: 0.0, scale: 1.3, rotSpeed: 0.004, bloom: 0.8 },
+  { x: 1.9, y: 0.0, z: 0.0, scale: 1.55, rotSpeed: 0.005, bloom: 0.75 }, // Stage 1 - Discover
+  { x: -2.2, y: 0.3, z: 0.0, scale: 1.35, rotSpeed: 0.007, bloom: 0.85 }, // Stage 2 - Origin & Manifesto
+  { x: 2.1, y: -0.3, z: 0.2, scale: 1.45, rotSpeed: 0.01, bloom: 0.95 }, // Stage 3 - Architecture
+  { x: 0.2, y: 0.5, z: 0.5, scale: 1.15, rotSpeed: 0.006, bloom: 1.1 }, // Stage 4 - System Nodes
+  { x: -2.0, y: -0.4, z: 0.1, scale: 1.5, rotSpeed: 0.012, bloom: 1.3 }, // Stage 5 - Temporal Mechanics
+  { x: 2.1, y: -0.7, z: 0.0, scale: 1.65, rotSpeed: 0.015, bloom: 1.45 }, // Stage 6 - Control & Telemetry
+  { x: -0.6, y: 0.0, z: 0.0, scale: 1.3, rotSpeed: 0.004, bloom: 0.8 }, // Stage 7 - Resolve
 ]
 
 function lerp(a: number, b: number, t: number) {
@@ -148,159 +149,7 @@ function interpolateKeyframes(progress: number) {
   }
 }
 
-// Parallax Depth Layers
-const ParallaxShapes = memo(function ParallaxShapes({
-  scrollProgress,
-}: {
-  scrollProgress: number
-}) {
-  const groupRef = useRef<THREE.Group>(null)
-
-  useFrame((_, delta) => {
-    if (!groupRef.current) return
-    groupRef.current.rotation.y += delta * 0.05
-    groupRef.current.rotation.x = Math.sin(scrollProgress * Math.PI * 2) * 0.2
-  })
-
-  const shapes = useMemo(() => {
-    return [...Array(18)].map((_, i) => ({
-      position: [
-        Math.sin(i * 0.5) * 9,
-        Math.cos(i * 0.7) * 7,
-        -3 - i * 0.4,
-      ] as [number, number, number],
-      rotation: [
-        Math.random() * Math.PI,
-        Math.random() * Math.PI,
-        Math.random() * Math.PI,
-      ] as [number, number, number],
-      scale: 0.25 + Math.random() * 0.25,
-      geometry:
-        i % 3 === 0
-          ? "octahedron"
-          : i % 3 === 1
-            ? "tetrahedron"
-            : "icosahedron",
-    }))
-  }, [])
-
-  return (
-    <group ref={groupRef} position={[0, 0, -4]}>
-      {shapes.map((shape, i) => (
-        <mesh
-          key={i}
-          position={shape.position}
-          rotation={shape.rotation}
-          scale={shape.scale}
-        >
-          {shape.geometry === "octahedron" && (
-            <octahedronGeometry args={[1, 0]} />
-          )}
-          {shape.geometry === "tetrahedron" && (
-            <tetrahedronGeometry args={[1, 0]} />
-          )}
-          {shape.geometry === "icosahedron" && (
-            <icosahedronGeometry args={[1, 0]} />
-          )}
-          <meshBasicMaterial
-            color="#580D18"
-            transparent
-            opacity={0.06}
-            wireframe
-          />
-        </mesh>
-      ))}
-    </group>
-  )
-})
-
-// Node Connection Lines
-const NodeConnections = memo(function NodeConnections() {
-  const lineRef = useRef<any>(null)
-
-  useFrame(({ clock }) => {
-    if (!lineRef.current) return
-    lineRef.current.material.opacity =
-      0.25 + Math.sin(clock.elapsedTime * 0.8) * 0.15
-  })
-
-  const points = useMemo(() => {
-    return [
-      new THREE.Vector3(...SYSTEM_NODES[0].position),
-      new THREE.Vector3(...SYSTEM_NODES[1].position),
-      new THREE.Vector3(...SYSTEM_NODES[2].position),
-      new THREE.Vector3(...SYSTEM_NODES[0].position),
-      new THREE.Vector3(...SYSTEM_NODES[3].position),
-      new THREE.Vector3(...SYSTEM_NODES[1].position),
-      new THREE.Vector3(...SYSTEM_NODES[3].position),
-      new THREE.Vector3(...SYSTEM_NODES[2].position),
-    ]
-  }, [])
-
-  return (
-    <Line
-      ref={lineRef}
-      points={points}
-      color="#812033"
-      lineWidth={1.2}
-      transparent
-      opacity={0.25}
-      dashed
-      dashScale={0.5}
-      dashSize={0.15}
-      gapSize={0.08}
-    />
-  )
-})
-
-// Data Stream Particles
-const DataStreamParticles = memo(function DataStreamParticles({
-  selectedNode,
-}: {
-  selectedNode: number | null
-}) {
-  const meshRef = useRef<THREE.InstancedMesh>(null)
-  const count = 80
-
-  const particles = useMemo(() => {
-    return [...Array(count)].map(() => ({
-      progress: Math.random(),
-      speed: 0.3 + Math.random() * 0.4,
-      fromNode: Math.floor(Math.random() * SYSTEM_NODES.length),
-    }))
-  }, [])
-
-  useFrame((_, delta) => {
-    if (!meshRef.current) return
-    particles.forEach((p, i) => {
-      p.progress = (p.progress + delta * p.speed * 0.15) % 1
-
-      const node = SYSTEM_NODES[p.fromNode]
-      const from = new THREE.Vector3(...node.position)
-      const to = new THREE.Vector3(0, 0, 0)
-
-      const pos = from.clone().lerp(to, p.progress)
-      const scale = 0.02 * (1 - p.progress * 0.7)
-
-      tempDummyObject.position.copy(pos)
-      tempDummyObject.scale.setScalar(scale)
-      tempDummyObject.updateMatrix()
-      meshRef.current?.setMatrixAt(i, tempDummyObject.matrix)
-    })
-    meshRef.current.instanceMatrix.needsUpdate = true
-  })
-
-  if (selectedNode === null) return null
-
-  return (
-    <instancedMesh ref={meshRef} args={[undefined, undefined, count]}>
-      <sphereGeometry args={[1, 8, 8]} />
-      <meshBasicMaterial color="#DB1A1A" transparent opacity={0.8} />
-    </instancedMesh>
-  )
-})
-
-// Instanced Dust Ring
+// High performance Instanced Mesh particle ring (Memoized)
 const InstancedDustRing = memo(function InstancedDustRing() {
   const count = 220
   const meshRef = useRef<THREE.InstancedMesh>(null)
@@ -343,7 +192,7 @@ const InstancedDustRing = memo(function InstancedDustRing() {
   )
 })
 
-// Gyro Gimbal Rings
+// Dual Precision Mechanical Gyro Gimbal Rings (Memoized)
 const GyroGimbalRings = memo(function GyroGimbalRings() {
   const outerRingRef = useRef<THREE.Mesh>(null)
   const innerRingRef = useRef<THREE.Mesh>(null)
@@ -365,6 +214,7 @@ const GyroGimbalRings = memo(function GyroGimbalRings() {
         <torusGeometry args={[1.55, 0.022, 16, 64]} />
         <meshStandardMaterial color="#3C0810" metalness={0.8} roughness={0.2} />
       </mesh>
+
       <mesh ref={innerRingRef}>
         <torusGeometry args={[1.35, 0.018, 16, 64]} />
         <meshStandardMaterial
@@ -377,7 +227,7 @@ const GyroGimbalRings = memo(function GyroGimbalRings() {
   )
 })
 
-// World Node Markers
+// Interactive 3D World-Space Node Markers (Memoized)
 const WorldNodeMarkers = memo(function WorldNodeMarkers({
   activeStage,
   selectedNode,
@@ -487,13 +337,11 @@ export default function Crystal3D({
   onSelectNode,
   controlState = { energy: 72, speed: 1.0, phase: 4 },
   onCursorState,
-  prefersReducedMotion = false,
 }: Crystal3DProps) {
   const crystalRef = useRef<THREE.Mesh>(null)
   const coreRef = useRef<THREE.Mesh>(null)
   const groupRef = useRef<THREE.Group>(null)
   const shaderMatRef = useRef<THREE.ShaderMaterial>(null)
-  const chromaticAberrationRef = useRef<any>(null)
   const elapsed = useRef(0)
 
   const crystalGeo = useMemo(() => getCrystalGeo(), [])
@@ -518,6 +366,7 @@ export default function Crystal3D({
     const progress = scrollProgressRef.current ?? 0
     const velocity = scrollVelocityRef.current ?? 0
 
+    // Pass uniforms to GLSL shader directly
     if (shaderMatRef.current) {
       shaderMatRef.current.uniforms.uTime.value = t
       shaderMatRef.current.uniforms.uSelectedNode.value =
@@ -527,12 +376,12 @@ export default function Crystal3D({
     }
 
     const kf = interpolateKeyframes(progress)
-    const velImpact = Math.min(Math.abs(velocity) * 0.0003, 0.05)
-    
-    // Reduce rotation speed significantly if reduced motion is preferred
-    const baseRotSpeed = prefersReducedMotion ? kf.rotSpeed * 0.2 : kf.rotSpeed
-    const effectiveRotSpeed = (baseRotSpeed + velImpact) * controlState.speed
 
+    // Dynamic scroll velocity rotational inertia
+    const velImpact = Math.min(Math.abs(velocity) * 0.0003, 0.05)
+    const effectiveRotSpeed = (kf.rotSpeed + velImpact) * controlState.speed
+
+    // Lerp group position towards camera keyframe S-curve
     let targetX = kf.x
     let targetY = kf.y
     let targetZ = kf.z
@@ -547,14 +396,17 @@ export default function Crystal3D({
     tempTargetPos.set(targetX, targetY, targetZ)
     groupRef.current.position.lerp(tempTargetPos, 0.06)
 
+    // Smooth scale lerping
     const currentScale = groupRef.current.scale.x
     const targetScale = selectedNode !== null ? kf.scale * 1.25 : kf.scale
     const newScale = lerp(currentScale, targetScale, 0.06)
     groupRef.current.scale.setScalar(newScale)
 
+    // Continuous artifact rotation
     crystalRef.current.rotation.x += effectiveRotSpeed * 0.75
     crystalRef.current.rotation.y += effectiveRotSpeed
 
+    // Inner core pulse effect
     const energyMult = controlState.energy / 100
     const pulse =
       (0.85 + Math.sin(t * 2.5 * controlState.speed) * 0.15) * energyMult
@@ -563,6 +415,7 @@ export default function Crystal3D({
     const mat = coreRef.current.material as THREE.MeshStandardMaterial
     mat.emissiveIntensity = kf.bloom * 1.6 * pulse
 
+    // Smooth camera positioning
     const camTargetX = selectedNode !== null ? 0 : kf.x * 0.18
     const camTargetY = selectedNode !== null ? 0 : kf.y * 0.12
     camera.position.x = lerp(camera.position.x, camTargetX, 0.04)
@@ -572,9 +425,6 @@ export default function Crystal3D({
 
   return (
     <>
-      {/* Lightweight environment map for metallic reflections on GyroGimbalRings */}
-      <Environment preset="studio" environmentIntensity={0.4} />
-      
       <ambientLight intensity={0.25} color="#F4F1EA" />
       <directionalLight position={[6, 9, 6]} intensity={0.6} color="#F4F1EA" />
       <pointLight
@@ -586,10 +436,7 @@ export default function Crystal3D({
       />
 
       <group ref={groupRef}>
-        <ParallaxShapes scrollProgress={currentScrollProgress} />
-        <NodeConnections />
-        <DataStreamParticles selectedNode={selectedNode} />
-
+        {/* Outer Fractured Crystal Shell */}
         <mesh ref={crystalRef} geometry={crystalGeo} castShadow>
           <shaderMaterial
             ref={shaderMatRef}
@@ -598,8 +445,10 @@ export default function Crystal3D({
           />
         </mesh>
 
+        {/* Dual Mechanical Gyro Gimbal Rings */}
         <GyroGimbalRings />
 
+        {/* Inner Resonator Core Sphere in Core Burgundy */}
         <mesh ref={coreRef}>
           <sphereGeometry args={[0.26, 24, 24]} />
           <meshStandardMaterial
@@ -611,8 +460,10 @@ export default function Crystal3D({
           />
         </mesh>
 
+        {/* High performance Instanced Mesh particle ring */}
         <InstancedDustRing />
 
+        {/* Interactive 3D World-Space Node Markers */}
         <WorldNodeMarkers
           activeStage={activeStage}
           selectedNode={selectedNode}
