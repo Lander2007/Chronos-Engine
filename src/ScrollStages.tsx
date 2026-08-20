@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, memo } from "react"
+import { useMagneticHover } from "./hooks/useMagneticHover"
 import {
   Sparkles,
   Activity,
@@ -33,6 +34,83 @@ import {
 } from "./components/Icons"
 import { SYSTEM_NODES } from "./Crystal3D"
 
+// Helper components that wrap buttons/links with the magnetic hover hook
+const MagneticButton = memo(function MagneticButton({
+  children,
+  className = "",
+  strength = 6,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  style,
+  disabled,
+  title,
+  "aria-label": ariaLabel,
+}: {
+  children: React.ReactNode
+  className?: string
+  strength?: number
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
+  onMouseEnter?: (e: React.MouseEvent<HTMLButtonElement>) => void
+  onMouseLeave?: (e: React.MouseEvent<HTMLButtonElement>) => void
+  style?: React.CSSProperties
+  disabled?: boolean
+  title?: string
+  "aria-label"?: string
+}) {
+  const ref = useMagneticHover<HTMLButtonElement>(null, strength)
+  return (
+    <button
+      ref={ref}
+      className={className}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={style}
+      disabled={disabled}
+      title={title}
+      aria-label={ariaLabel}
+    >
+      {children}
+    </button>
+  )
+})
+
+const MagneticAnchor = memo(function MagneticAnchor({
+  children,
+  className = "",
+  strength = 6,
+  href,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  style,
+}: {
+  children: React.ReactNode
+  className?: string
+  strength?: number
+  href?: string
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void
+  onMouseEnter?: (e: React.MouseEvent<HTMLAnchorElement>) => void
+  onMouseLeave?: (e: React.MouseEvent<HTMLAnchorElement>) => void
+  style?: React.CSSProperties
+}) {
+  const ref = useMagneticHover<HTMLAnchorElement>(null, strength)
+  return (
+    <a
+      ref={ref}
+      href={href}
+      className={className}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={style}
+    >
+      {children}
+    </a>
+  )
+})
+
 interface ControlState {
   energy: number
   speed: number
@@ -50,19 +128,46 @@ interface ScrollStagesProps {
   prefersReducedMotion?: boolean
 }
 
-function useEntrance(threshold = 0.2, prefersReducedMotion = false) {
+type EntranceConfig = {
+  delayMs?: number
+  translateY?: number
+  translateX?: number
+}
+
+function useEntrance(
+  threshold = 0.2,
+  prefersReducedMotion = false,
+  config: EntranceConfig = {},
+) {
+  const { delayMs = 0, translateY = 0, translateX = 0 } = config
   const ref = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    
-    // Skip entrance animation if reduced motion is preferred
+
+    const easing = "cubic-bezier(0.16, 1, 0.3, 1)"
+    const hasMotion = translateY !== 0 || translateX !== 0
+    const baseTransition = `opacity 0.8s ${easing}`
+    const motionTransition = hasMotion
+      ? `${baseTransition}, transform 0.8s ${easing}`
+      : baseTransition
+
     if (prefersReducedMotion) {
-      el.style.opacity = "1"
-      el.style.transform = "translate3d(0,0,0)"
-      return
+      el.style.opacity = "0"
+      if (hasMotion) {
+        el.style.transform = "translate3d(0,0,0)"
+      }
+      el.style.transition = baseTransition
+    } else if (hasMotion) {
+      el.style.opacity = "0"
+      el.style.transform = `translate3d(${translateX}px, ${translateY}px, 0)`
+      el.style.transition = motionTransition
+      if (delayMs > 0) {
+        el.style.transitionDelay = `${delayMs}ms`
+      }
     }
-    
+
     const obs = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -75,7 +180,8 @@ function useEntrance(threshold = 0.2, prefersReducedMotion = false) {
     )
     obs.observe(el)
     return () => obs.disconnect()
-  }, [threshold, prefersReducedMotion])
+  }, [threshold, prefersReducedMotion, delayMs, translateY, translateX])
+
   return ref
 }
 
@@ -474,7 +580,7 @@ const TechnicalSpecCard = memo(function TechnicalSpecCard({
           ))}
       </div>
 
-      <button
+      <MagneticButton
         className="btn-rect"
         onClick={onOpenFullSpecs}
         onMouseEnter={() => onCursorState?.("hover")}
@@ -485,7 +591,7 @@ const TechnicalSpecCard = memo(function TechnicalSpecCard({
         <span className="btn-arrow">
           <ArrowRight size={15} />
         </span>
-      </button>
+      </MagneticButton>
     </div>
   )
 })
@@ -767,6 +873,256 @@ const TemporalMechanicsCard = memo(function TemporalMechanicsCard({
         </p>
       </div>
     </div>
+  )
+})
+
+const FieldNoteQuoteSection = memo(function FieldNoteQuoteSection({
+  prefersReducedMotion,
+}: {
+  prefersReducedMotion?: boolean
+}) {
+  const sectionRef = useRef<HTMLElement>(null)
+  const contentRef = useEntrance(0.2, prefersReducedMotion ?? false, {
+    translateY: 20,
+  })
+
+  // IntersectionObserver to fade NavTrack & MobileStageBar when Field Note Quote section is in viewport
+  useEffect(() => {
+    const el = sectionRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          document.body.classList.add("in-field-note")
+        } else {
+          document.body.classList.remove("in-field-note")
+        }
+      },
+      { threshold: 0.25 },
+    )
+
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      document.body.classList.remove("in-field-note")
+    }
+  }, [])
+
+  return (
+    <section
+      id="field-note-quote"
+      ref={sectionRef}
+      className="field-note-quote"
+      aria-label="Chronos Engine field notes"
+    >
+      <div className="field-note-decor" aria-hidden="true">
+        <div className="field-note-glow-ring" />
+        <div className="field-note-line-ring" />
+      </div>
+
+      <div ref={contentRef} className="field-note-content">
+        <blockquote className="field-note-quote-text">
+          &ldquo;To observe time is to discover that you are already inside the
+          experiment.&rdquo;
+        </blockquote>
+
+        <p className="field-note-caption">
+          &mdash; CHRONOS ENGINE FIELD NOTES / ENTRY 04
+        </p>
+      </div>
+    </section>
+  )
+})
+
+const TEMPORAL_FIELD_ITEMS = [
+  {
+    num: "01",
+    title: "Potential",
+    body: "Before the first tick, time is not yet a line. It is a field of possible directions, held in tension by the artifact.",
+  },
+  {
+    num: "02",
+    title: "Expansion",
+    body: "The present opens. A moment becomes measurable. Distance appears between what was and what is about to be.",
+  },
+  {
+    num: "03",
+    title: "Resonance",
+    body: "Memory leaves a trace. Events do not disappear. Their pressure travels through the field as a signal we can still read.",
+  },
+  {
+    num: "04",
+    title: "Return",
+    body: "Nothing arrives unchanged. The loop closes without repeating itself. What returns carries the imprint of the journey.",
+  },
+] as const
+
+const TemporalFieldItemView = memo(function TemporalFieldItemView({
+  num,
+  title,
+  body,
+  index,
+  isActive,
+  onHover,
+  prefersReducedMotion,
+}: {
+  num: string
+  title: string
+  body: string
+  index: number
+  isActive: boolean
+  onHover: (index: number) => void
+  prefersReducedMotion?: boolean
+}) {
+  const ref = useEntrance(0.15, prefersReducedMotion ?? false, {
+    translateY: 16,
+    delayMs: prefersReducedMotion ? 0 : index * 80,
+  })
+
+  return (
+    <div
+      ref={ref}
+      className={`temporal-field-item ${isActive ? "active" : ""}`}
+      onMouseEnter={() => onHover(index)}
+      style={{ opacity: 0 }}
+    >
+      <div className="temporal-field-divider" />
+      <div className="temporal-field-item-header">
+        <span className="temporal-field-num">{num}</span>
+        <h3 className="temporal-field-title">{title}</h3>
+      </div>
+      <p className="temporal-field-body">{body}</p>
+    </div>
+  )
+})
+
+const TemporalFieldSection = memo(function TemporalFieldSection({
+  prefersReducedMotion,
+}: {
+  prefersReducedMotion?: boolean
+}) {
+  const [activeIndex, setActiveIndex] = useState(2) // Default item 03 active
+  const introRef = useEntrance(0.2, prefersReducedMotion ?? false, {
+    translateX: -20,
+  })
+
+  return (
+    <section
+      id="temporal-field"
+      aria-label="The temporal field"
+      className="temporal-field-section"
+    >
+      <div className="temporal-field-grid">
+        {/* Left Column */}
+        <div ref={introRef} style={{ opacity: 0 }}>
+          {/* Top-left Decorative Instrument Icon */}
+          <svg
+            width="36"
+            height="36"
+            viewBox="0 0 36 36"
+            fill="none"
+            aria-hidden="true"
+            style={{ marginBottom: "32px", display: "block" }}
+          >
+            <circle
+              cx="18"
+              cy="18"
+              r="16"
+              stroke="rgba(218, 165, 32, 0.4)"
+              strokeWidth="1.5"
+            />
+            <circle cx="18" cy="18" r="3" fill="rgba(212, 175, 55, 0.6)" />
+          </svg>
+
+          <p
+            className="type-level-05"
+            style={{ marginBottom: "20px", color: "#DAA520" }}
+          >
+            THE TEMPORAL FIELD
+          </p>
+
+          <h2 className="temporal-field-headline">
+            Four ways a moment can move.
+          </h2>
+
+          <p className="temporal-field-intro">
+            There is no single direction here. Explore the instrument as a
+            sequence, or treat each stage as its own weather system.
+          </p>
+
+          {/* Bottom Decorative Icon */}
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+            style={{ display: "block", marginTop: "56px", opacity: 0.3 }}
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="rgba(218, 165, 32, 0.5)"
+              strokeWidth="1"
+            />
+            <circle cx="12" cy="12" r="2" fill="rgba(212, 175, 55, 0.7)" />
+          </svg>
+        </div>
+
+        {/* Right Column */}
+        <div>
+          {/* Meta Status Row */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-end",
+              gap: "10px",
+              marginBottom: "48px",
+              fontFamily: "var(--font-mono)",
+              fontSize: "0.7rem",
+              letterSpacing: "0.08em",
+              textTransform: "uppercase",
+            }}
+          >
+            <span
+              aria-hidden="true"
+              style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "50%",
+                background: "#D4AF37",
+                boxShadow: "0 0 8px rgba(218, 165, 32, 0.6)",
+              }}
+            />
+            <span style={{ color: "rgba(244, 241, 234, 0.8)" }}>
+              Signal nominal
+            </span>
+            <span style={{ opacity: 0.5, color: "rgba(244, 241, 234, 0.6)" }}>
+              CE-04 / 2024
+            </span>
+          </div>
+
+          {/* Plain Divided List */}
+          <div className="temporal-field-list">
+            {TEMPORAL_FIELD_ITEMS.map((item, index) => (
+              <TemporalFieldItemView
+                key={item.num}
+                num={item.num}
+                title={item.title}
+                body={item.body}
+                index={index}
+                isActive={index === activeIndex}
+                onHover={setActiveIndex}
+                prefersReducedMotion={prefersReducedMotion}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   )
 })
 
@@ -1209,6 +1565,7 @@ export default function ScrollStages({
   controlState,
   onControlChange,
   onCursorState,
+  prefersReducedMotion = false,
 }: ScrollStagesProps) {
   const [isSpecDrawerOpen, setIsSpecDrawerOpen] = useState(false)
   const activeNodeData =
@@ -1222,6 +1579,15 @@ export default function ScrollStages({
         onClick={() => onSelectNode(null)}
       >
         <div className="modal-float-panel" onClick={(e) => e.stopPropagation()}>
+          <MagneticButton
+            className="modal-float-close"
+            aria-label="Close diagnostic modal"
+            onClick={() => onSelectNode(null)}
+            onMouseEnter={() => onCursorState?.("hover")}
+            onMouseLeave={() => onCursorState?.("default")}
+          >
+            <X size={16} />
+          </MagneticButton>
           {activeNodeData && (
             <div>
               <div
@@ -1353,7 +1719,7 @@ export default function ScrollStages({
               <div
                 style={{ display: "flex", gap: "12px", marginBottom: "20px" }}
               >
-                <button
+                <MagneticButton
                   className="btn-rect btn-rect-secondary"
                   onClick={() =>
                     onSelectNode(
@@ -1382,8 +1748,8 @@ export default function ScrollStages({
                     <ArrowLeft size={14} />
                     <span>PREV NODE</span>
                   </span>
-                </button>
-                <button
+                </MagneticButton>
+                <MagneticButton
                   className="btn-rect btn-rect-secondary"
                   onClick={() =>
                     onSelectNode(
@@ -1411,10 +1777,10 @@ export default function ScrollStages({
                     <span>NEXT NODE</span>
                     <ArrowRight size={14} />
                   </span>
-                </button>
+                </MagneticButton>
               </div>
 
-              <button
+              <MagneticButton
                 className="btn-rect"
                 onClick={() => onSelectNode(null)}
                 onMouseEnter={() => onCursorState?.("hover")}
@@ -1425,7 +1791,7 @@ export default function ScrollStages({
                 <span className="btn-arrow">
                   <ArrowRight size={16} />
                 </span>
-              </button>
+              </MagneticButton>
             </div>
           )}
         </div>
@@ -1437,6 +1803,15 @@ export default function ScrollStages({
         onClick={() => setIsSpecDrawerOpen(false)}
       >
         <div className="modal-float-panel" onClick={(e) => e.stopPropagation()}>
+          <MagneticButton
+            className="modal-float-close"
+            aria-label="Close specification dossier"
+            onClick={() => setIsSpecDrawerOpen(false)}
+            onMouseEnter={() => onCursorState?.("hover")}
+            onMouseLeave={() => onCursorState?.("default")}
+          >
+            <X size={16} />
+          </MagneticButton>
           <div>
             <div
               style={{
@@ -1557,7 +1932,7 @@ export default function ScrollStages({
               ))}
             </div>
 
-            <button
+            <MagneticButton
               className="btn-rect"
               onClick={() => setIsSpecDrawerOpen(false)}
               onMouseEnter={() => onCursorState?.("hover")}
@@ -1568,7 +1943,7 @@ export default function ScrollStages({
               <span className="btn-arrow">
                 <X size={16} />
               </span>
-            </button>
+            </MagneticButton>
           </div>
         </div>
       </div>
@@ -1673,7 +2048,7 @@ export default function ScrollStages({
               flexWrap: "wrap",
             }}
           >
-            <a
+            <MagneticAnchor
               href="#stage-2"
               className="btn-rect"
               onMouseEnter={() => onCursorState?.("hover")}
@@ -1683,7 +2058,7 @@ export default function ScrollStages({
               <span className="btn-arrow">
                 <ArrowRight size={16} />
               </span>
-            </a>
+            </MagneticAnchor>
 
             <span
               className="type-level-05"
@@ -1760,9 +2135,14 @@ export default function ScrollStages({
             margin: "0 auto",
           }}
         >
-          <OriginManifestoCard onCursorState={onCursorState} />
+          <OriginManifestoCard
+            onCursorState={onCursorState}
+            prefersReducedMotion={prefersReducedMotion}
+          />
         </div>
       </section>
+
+      <FieldNoteQuoteSection prefersReducedMotion={prefersReducedMotion} />
 
       <section
         id="stage-3"
@@ -1829,6 +2209,8 @@ export default function ScrollStages({
           />
         </div>
       </section>
+
+      <TemporalFieldSection prefersReducedMotion={prefersReducedMotion} />
 
       <section
         id="stage-4"
@@ -2076,7 +2458,7 @@ export default function ScrollStages({
               marginBottom: "48px",
             }}
           >
-            <button
+            <MagneticButton
               className="cta-primary"
               onClick={() => setIsSpecDrawerOpen(true)}
               onMouseEnter={() => onCursorState?.("hover")}
@@ -2087,8 +2469,8 @@ export default function ScrollStages({
               <span className="cta-icon-arrow">
                 <ArrowRight size={16} />
               </span>
-            </button>
-            <button
+            </MagneticButton>
+            <MagneticButton
               className="cta-secondary"
               onClick={() => setIsSpecDrawerOpen(true)}
               onMouseEnter={() => onCursorState?.("hover")}
@@ -2096,7 +2478,7 @@ export default function ScrollStages({
             >
               <FileText size={15} />
               <span>VIEW SPECIFICATIONS</span>
-            </button>
+            </MagneticButton>
           </div>
 
           <div

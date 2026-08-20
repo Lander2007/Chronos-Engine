@@ -17,6 +17,7 @@ export default defineConfig(({ mode }) => {
     build: {
       sourcemap: emitSourcemaps ? "inline" : false,
       minify: !emitSourcemaps,
+      cssMinify: false,
     },
     plugins: [
       react(),

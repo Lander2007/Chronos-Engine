@@ -1,4 +1,12 @@
-import { useState, useEffect, useRef, useCallback, Suspense, memo, lazy } from "react"
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  Suspense,
+  memo,
+  lazy,
+} from "react"
 import { Canvas } from "@react-three/fiber"
 import * as THREE from "three"
 import Lenis from "lenis"
@@ -20,6 +28,8 @@ import {
   ChevronDown,
 } from "./components/Icons"
 
+import { useMagneticHover } from "./hooks/useMagneticHover"
+
 // Lazy-load the heavy 3D component to defer 600KB+ three.js bundle
 const Crystal3D = lazy(() => import("./Crystal3D"))
 const ScrollStages = lazy(() => import("./ScrollStages"))
@@ -33,52 +43,63 @@ const PrecisionCursor = memo(function PrecisionCursor({
   prefersReducedMotion: boolean
 }) {
   const dotRef = useRef<HTMLDivElement>(null)
-  const trailRef = useRef<HTMLDivElement>(null)
-  const posRef = useRef({ x: 0, y: 0 })
-  const trailPos = useRef({ x: 0, y: 0 })
+  const ringRef = useRef<HTMLDivElement>(null)
+  const mousePos = useRef({ x: -100, y: -100 })
+  const ringPos = useRef({ x: -100, y: -100 })
 
+  // Sync cursor state attribute to document body for global CSS targeting
   useEffect(() => {
     document.body.setAttribute("data-cursor-state", cursorState)
+    return () => {
+      document.body.removeAttribute("data-cursor-state")
+    }
   }, [cursorState])
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      posRef.current = { x: e.clientX, y: e.clientY }
+      mousePos.current = { x: e.clientX, y: e.clientY }
       if (dotRef.current) {
         dotRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
       }
-    }
-
-    window.addEventListener("mousemove", handleMouseMove, { passive: true })
-    return () => window.removeEventListener("mousemove", handleMouseMove)
-  }, [])
-
-  useEffect(() => {
-    // Skip smooth trail animation if reduced motion is preferred
-    if (prefersReducedMotion) {
-      if (trailRef.current) {
-        trailRef.current.style.transform = `translate3d(${posRef.current.x}px, ${posRef.current.y}px, 0)`
+      if (prefersReducedMotion && ringRef.current) {
+        ringRef.current.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0)`
       }
-      return
     }
-    
-    let animId: number
-    const loop = () => {
-      trailPos.current.x += (posRef.current.x - trailPos.current.x) * 0.18
-      trailPos.current.y += (posRef.current.y - trailPos.current.y) * 0.18
-      if (trailRef.current) {
-        trailRef.current.style.transform = `translate3d(${trailPos.current.x}px, ${trailPos.current.y}px, 0)`
+    window.addEventListener("mousemove", handleMouseMove)
+
+    let rafId: number
+    const animateRing = () => {
+      if (!prefersReducedMotion) {
+        const lerp = 0.2
+        ringPos.current.x += (mousePos.current.x - ringPos.current.x) * lerp
+        ringPos.current.y += (mousePos.current.y - ringPos.current.y) * lerp
+
+        if (ringRef.current) {
+          ringRef.current.style.transform = `translate3d(${ringPos.current.x.toFixed(2)}px, ${ringPos.current.y.toFixed(2)}px, 0)`
+        }
       }
-      animId = requestAnimationFrame(loop)
+      rafId = requestAnimationFrame(animateRing)
     }
-    animId = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(animId)
+    rafId = requestAnimationFrame(animateRing)
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove)
+      cancelAnimationFrame(rafId)
+    }
   }, [prefersReducedMotion])
 
   return (
     <>
-      <div ref={dotRef} className="cursor-dot" />
-      <div ref={trailRef} className="cursor-trail" />
+      <div
+        ref={dotRef}
+        className={`cursor-dot ${cursorState}`}
+        style={{ pointerEvents: "none" }}
+      />
+      <div
+        ref={ringRef}
+        className={`cursor-trail ${cursorState}`}
+        style={{ pointerEvents: "none" }}
+      />
     </>
   )
 })
@@ -94,7 +115,63 @@ const NAV_STAGES = [
   { id: "stage-7", num: "07", label: "Resolve", Icon: Sparkles },
 ]
 
-const VerticalTrackNav = memo(function VerticalTrackNav({
+// Single Nav Track Node Item with magnetic hover
+const NavTrackItem = memo(function NavTrackItem({
+  stage,
+  idx,
+  activeStageIndex,
+  scrollToStage,
+  onCursorState,
+}: {
+  stage: typeof NAV_STAGES[number]
+  idx: number
+  activeStageIndex: number
+  scrollToStage: (idx: number) => void
+  onCursorState: (state: "default" | "hover" | "node") => void
+}) {
+  const isActive = activeStageIndex === idx
+  const StageIcon = stage.Icon
+  const btnRef = useMagneticHover<HTMLButtonElement>(null, 6)
+
+  return (
+    <button
+      ref={btnRef}
+      onClick={() => scrollToStage(idx)}
+      onMouseEnter={() => onCursorState("hover")}
+      onMouseLeave={() => onCursorState("default")}
+      className={`nav-track-node ${isActive ? "active" : ""}`}
+      title={stage.label}
+    >
+      <span
+        className="nav-track-label"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "6px",
+        }}
+      >
+        <StageIcon
+          size={12}
+          style={{ color: isActive ? "#DB1A1A" : "#580D18" }}
+        />
+        <span>{stage.label}</span>
+        <ChevronRight
+          size={10}
+          style={{
+            opacity: isActive ? 1 : 0.4,
+            transform: isActive ? "translateX(2px)" : "none",
+            transition: "all 0.25s ease",
+          }}
+        />
+      </span>
+      <span className="nav-track-num">{stage.num}</span>
+      <div className="nav-track-line" />
+    </button>
+  )
+})
+
+// Desktop Stage Navigation Track (Memoized)
+const NavTrack = memo(function NavTrack({
   activeStageIndex,
   onCursorState,
 }: {
@@ -102,54 +179,25 @@ const VerticalTrackNav = memo(function VerticalTrackNav({
   onCursorState: (state: "default" | "hover" | "node") => void
 }) {
   const scrollToStage = (index: number) => {
+    const targetIdx = Math.max(0, Math.min(NAV_STAGES.length - 1, index))
     const totalHeight =
       document.documentElement.scrollHeight - window.innerHeight
-    const targetY = (index / (NAV_STAGES.length - 1)) * totalHeight
+    const targetY = (targetIdx / (NAV_STAGES.length - 1)) * totalHeight
     window.scrollTo({ top: targetY, behavior: "smooth" })
   }
 
   return (
     <nav className="nav-track" aria-label="Chronos Engine Navigation">
-      {NAV_STAGES.map((stage, idx) => {
-        const isActive = activeStageIndex === idx
-        const StageIcon = stage.Icon
-
-        return (
-          <button
-            key={stage.id}
-            onClick={() => scrollToStage(idx)}
-            onMouseEnter={() => onCursorState("hover")}
-            onMouseLeave={() => onCursorState("default")}
-            className={`nav-track-node ${isActive ? "active" : ""}`}
-            title={stage.label}
-          >
-            <span
-              className="nav-track-label"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "6px",
-              }}
-            >
-              <StageIcon
-                size={12}
-                style={{ color: isActive ? "#DB1A1A" : "#580D18" }}
-              />
-              <span>{stage.label}</span>
-              <ChevronRight
-                size={10}
-                style={{
-                  opacity: isActive ? 1 : 0.4,
-                  transform: isActive ? "translateX(2px)" : "none",
-                  transition: "all 0.25s ease",
-                }}
-              />
-            </span>
-            <span className="nav-track-num">{stage.num}</span>
-            <div className="nav-track-line" />
-          </button>
-        )
-      })}
+      {NAV_STAGES.map((stage, idx) => (
+        <NavTrackItem
+          key={stage.id}
+          stage={stage}
+          idx={idx}
+          activeStageIndex={activeStageIndex}
+          scrollToStage={scrollToStage}
+          onCursorState={onCursorState}
+        />
+      ))}
     </nav>
   )
 })
@@ -229,54 +277,105 @@ const MobileStageBar = memo(function MobileStageBar({
   )
 })
 
-// Global Top Header with Direct DOM Progress Bar (Memoized)
-const GlobalHeader = memo(function GlobalHeader({
-  progressBarRef,
+// Header Audio Toggle Button with magnetic hover
+const HeaderAudioButton = memo(function HeaderAudioButton({
   isAudioOn,
   onToggleAudio,
   onCursorState,
 }: {
-  progressBarRef: React.RefObject<HTMLDivElement | null>
   isAudioOn: boolean
   onToggleAudio: () => void
   onCursorState: (state: "default" | "hover" | "node") => void
 }) {
-  const [timeStr, setTimeStr] = useState("00:00:00:00")
+  const btnRef = useMagneticHover<HTMLButtonElement>(null, 4)
+
+  return (
+    <button
+      ref={btnRef}
+      onClick={onToggleAudio}
+      onMouseEnter={() => onCursorState("hover")}
+      onMouseLeave={() => onCursorState("default")}
+      style={{
+        background: isAudioOn ? "rgba(219,26,26,0.08)" : "transparent",
+        border: "1px solid " + (isAudioOn ? "#DB1A1A" : "rgba(88,13,24,0.3)"),
+        color: isAudioOn ? "#DB1A1A" : "rgba(88,13,24,0.7)",
+        padding: "6px 14px",
+        fontFamily: "var(--font-mono)",
+        fontSize: "0.62rem",
+        letterSpacing: "0.12em",
+        transition: "all 0.25s ease",
+        display: "flex",
+        alignItems: "center",
+        gap: "8px",
+        boxShadow: isAudioOn ? "0 0 16px rgba(219,26,26,0.2)" : "none",
+      }}
+    >
+      {isAudioOn ? (
+        <>
+          <Volume2 size={13} style={{ color: "#DB1A1A" }} />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              gap: "2px",
+              height: "10px",
+            }}
+          >
+            <span className="eq-bar eq-bar-1" />
+            <span className="eq-bar eq-bar-2" />
+            <span className="eq-bar eq-bar-3" />
+          </div>
+        </>
+      ) : (
+        <VolumeX size={13} style={{ opacity: 0.6 }} />
+      )}
+      <span className="header-meta">
+        SOUND: {isAudioOn ? "ON (7.83Hz)" : "OFF"}
+      </span>
+    </button>
+  )
+})
+
+// Header Navigation Bar (Memoized)
+const GlobalHeader = memo(function GlobalHeader({
+  activeStageIndex,
+  isAudioOn,
+  onToggleAudio,
+  onCursorState,
+}: {
+  activeStageIndex: number
+  isAudioOn: boolean
+  onToggleAudio: () => void
+  onCursorState: (state: "default" | "hover" | "node") => void
+}) {
+  const [timeStr, setTimeStr] = useState("")
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    const update = () => {
       const now = new Date()
-      const ms = String(Math.floor(now.getMilliseconds() / 10)).padStart(2, "0")
-      const sec = String(now.getSeconds()).padStart(2, "0")
-      const min = String(now.getMinutes()).padStart(2, "0")
-      const hr = String(now.getHours()).padStart(2, "0")
-      setTimeStr(`${hr}:${min}:${sec}:${ms}`)
-    }, 40)
+      setTimeStr(
+        now.toTimeString().split(" ")[0] +
+          "." +
+          String(now.getMilliseconds()).padStart(3, "0"),
+      )
+    }
+    update()
+    const timer = setInterval(update, 60)
     return () => clearInterval(timer)
   }, [])
 
   return (
     <>
-      <div
-        ref={progressBarRef}
-        className="global-progress-bar"
-        style={{ width: "0%" }}
-      />
-
       <header className="global-header">
         <div className="brand-badge">
-          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <Activity
-              size={16}
-              className="icon-pulse-glow"
-              style={{ color: "#DB1A1A" }}
-            />
-            <div className="brand-dot" />
-          </div>
+          <span className="brand-dot" />
           <span className="brand-title">CHRONOS ENGINE</span>
           <span
             className="header-meta"
             style={{
+              opacity: 0.45,
+              fontSize: "0.62rem",
+              fontFamily: "var(--font-mono)",
               marginLeft: "6px",
               display: "inline-flex",
               alignItems: "center",
@@ -289,49 +388,11 @@ const GlobalHeader = memo(function GlobalHeader({
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
-          <button
-            onClick={onToggleAudio}
-            onMouseEnter={() => onCursorState("hover")}
-            onMouseLeave={() => onCursorState("default")}
-            style={{
-              background: isAudioOn ? "rgba(219,26,26,0.08)" : "transparent",
-              border:
-                "1px solid " + (isAudioOn ? "#DB1A1A" : "rgba(88,13,24,0.3)"),
-              color: isAudioOn ? "#DB1A1A" : "rgba(88,13,24,0.7)",
-              padding: "6px 14px",
-              fontFamily: "var(--font-mono)",
-              fontSize: "0.62rem",
-              letterSpacing: "0.12em",
-              transition: "all 0.25s ease",
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              boxShadow: isAudioOn ? "0 0 16px rgba(219,26,26,0.2)" : "none",
-            }}
-          >
-            {isAudioOn ? (
-              <>
-                <Volume2 size={13} style={{ color: "#DB1A1A" }} />
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "flex-end",
-                    gap: "2px",
-                    height: "10px",
-                  }}
-                >
-                  <span className="eq-bar eq-bar-1" />
-                  <span className="eq-bar eq-bar-2" />
-                  <span className="eq-bar eq-bar-3" />
-                </div>
-              </>
-            ) : (
-              <VolumeX size={13} style={{ opacity: 0.6 }} />
-            )}
-            <span className="header-meta">
-              SOUND: {isAudioOn ? "ON (7.83Hz)" : "OFF"}
-            </span>
-          </button>
+          <HeaderAudioButton
+            isAudioOn={isAudioOn}
+            onToggleAudio={onToggleAudio}
+            onCursorState={onCursorState}
+          />
         </div>
       </header>
     </>
@@ -349,6 +410,7 @@ const InitialLoader = memo(function InitialLoader({
   const [progress, setProgress] = useState(0)
   const [isReady, setIsReady] = useState(false)
   const [isDismissed, setIsDismissed] = useState(false)
+  const enterBtnRef = useMagneticHover<HTMLButtonElement>(null, 6)
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -437,6 +499,7 @@ const InitialLoader = memo(function InitialLoader({
 
         {isReady && (
           <button
+            ref={enterBtnRef}
             className="btn-rect"
             onClick={handleEnter}
             onMouseEnter={() => onCursorState("hover")}
@@ -482,7 +545,7 @@ export default function App() {
   )
   const [isAudioOn, setIsAudioOn] = useState(false)
   const [isSystemLoaded, setIsSystemLoaded] = useState(false)
-  
+
   // Check for reduced motion preference
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
@@ -496,18 +559,18 @@ export default function App() {
   const ticking = useRef(false)
   const audioCtxRef = useRef<AudioContext | null>(null)
   const oscRef = useRef<OscillatorNode | null>(null)
-  
+
   // Detect reduced motion preference
   useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
     setPrefersReducedMotion(mediaQuery.matches)
-    
+
     const handleChange = (e: MediaQueryListEvent) => {
       setPrefersReducedMotion(e.matches)
     }
-    
-    mediaQuery.addEventListener('change', handleChange)
-    return () => mediaQuery.removeEventListener('change', handleChange)
+
+    mediaQuery.addEventListener("change", handleChange)
+    return () => mediaQuery.removeEventListener("change", handleChange)
   }, [])
 
   const updateControlState = useCallback(
@@ -585,7 +648,6 @@ export default function App() {
       gestureOrientation: "vertical",
       smoothWheel: true,
       wheelMultiplier: 1.0,
-      smoothTouch: false,
       touchMultiplier: 2,
       infinite: false,
     })
@@ -626,16 +688,19 @@ export default function App() {
         position: "relative",
       }}
     >
-      <PrecisionCursor cursorState={cursorState} prefersReducedMotion={prefersReducedMotion} />
+      <PrecisionCursor
+        cursorState={cursorState}
+        prefersReducedMotion={prefersReducedMotion}
+      />
 
       <GlobalHeader
-        progressBarRef={progressBarRef}
+        activeStageIndex={activeStageIndex}
         isAudioOn={isAudioOn}
         onToggleAudio={toggleAudio}
         onCursorState={setCursorState}
       />
 
-      <VerticalTrackNav
+      <NavTrack
         activeStageIndex={activeStageIndex}
         onCursorState={setCursorState}
       />
